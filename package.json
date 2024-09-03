@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/noisejs": "^0.0.31",
+    "framer-motion": "^11.3.31",
     "gsap": "^3.12.5",
     "lucide-react": "^0.438.0",
     "next": "14.2.7",

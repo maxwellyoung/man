@@ -2,7 +2,12 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
-import { montserrat } from "./fonts";
+import { Montserrat } from "next/font/google";
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+});
 
 export default function MotionDesignMANAnimation() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,133 +29,150 @@ export default function MotionDesignMANAnimation() {
     const containerHeight = container.clientHeight;
     const scaleFactor = Math.min(containerWidth / 1000, containerHeight / 800);
 
-    // Create background
-    const bgEl = document.createElement("div");
-    bgEl.style.cssText = `
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-color: ${colors.background};
-    `;
-    container.appendChild(bgEl);
+    const createElement = (
+      type: "div" | "img",
+      styles: Partial<CSSStyleDeclaration>,
+      parent: HTMLElement,
+      content?: string
+    ) => {
+      const element = document.createElement(type);
+      Object.assign(element.style, styles);
+      if (content) element.textContent = content;
+      parent.appendChild(element);
+      return element;
+    };
 
-    // Create M.A.N. elements
+    const bgEl = createElement(
+      "div",
+      {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        backgroundColor: colors.background,
+      },
+      container
+    );
+
     const manLetters = ["M", "A", "N"];
-    const letterElements = manLetters.map((letter, index) => {
-      const letterEl = document.createElement("div");
-      letterEl.textContent = letter;
-      letterEl.style.cssText = `
-        position: absolute;
-        font-size: ${28 * scaleFactor}vmin;
-        font-weight: 700;
-        color: ${colors.primary};
-        opacity: 0;
-        left: ${25 + 25 * index}%;
-        top: 30%;
-        transform: translate(-50%, -50%);
-        font-family: 'Montserrat', sans-serif;
-      `;
-      container.appendChild(letterEl);
-      return letterEl;
-    });
-
-    // Create word elements
     const words = ["METROSEXUAL", "AWARENESS", "NIGHT"];
-    const wordElements = words.map((word, index) => {
-      const wordEl = document.createElement("div");
-      wordEl.textContent = word;
-      wordEl.style.cssText = `
-        position: absolute;
-        font-size: ${4.5 * scaleFactor}vmin;
-        font-weight: 300;
-        color: ${colors.secondary};
-        opacity: 0;
-        left: ${25 + 25 * index}%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        font-family: 'Montserrat', sans-serif;
-      `;
-      container.appendChild(wordEl);
-      return wordEl;
-    });
+    const letterElements = manLetters.map((letter, index) =>
+      createElement(
+        "div",
+        {
+          position: "absolute",
+          fontSize: `${28 * scaleFactor}vmin`,
+          fontWeight: "700",
+          color: colors.primary,
+          opacity: "0",
+          left: `${25 + 25 * index}%`,
+          top: "40%",
+          transform: "translate(-50%, -50%)",
+          fontFamily: "var(--font-montserrat)",
+          padding: `${2 * scaleFactor}vmin`,
+        },
+        container,
+        letter
+      )
+    );
 
-    // Create unisex toilet icon
-    const iconEl = document.createElement("img");
+    const wordElements = words.map((word, index) =>
+      createElement(
+        "div",
+        {
+          position: "absolute",
+          fontSize: `${4 * scaleFactor}vmin`,
+          fontWeight: "500",
+          color: colors.secondary,
+          opacity: "0",
+          left: `${25 + 25 * index}%`,
+          top: "60%",
+          transform: "translate(-50%, -50%)",
+          fontFamily: "var(--font-montserrat)",
+          textAlign: "center",
+          width: "30%",
+        },
+        container,
+        word
+      )
+    );
+
+    const iconEl = createElement(
+      "img",
+      {
+        position: "absolute",
+        width: `${20 * scaleFactor}vmin`,
+        height: "auto",
+        left: "50%",
+        top: "75%",
+        transform: "translate(-50%, -50%)",
+        opacity: "0",
+        filter: "brightness(0.5)",
+      },
+      container
+    ) as HTMLImageElement;
     iconEl.src =
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Unisex%20public%20toilet-z8yBJUf1pIGuXhaD5j9mER4pyWvwUh.png";
     iconEl.alt = "Unisex public toilet icon";
-    iconEl.style.cssText = `
-      position: absolute;
-      width: ${22 * scaleFactor}vmin;
-      height: auto;
-      left: 50%;
-      top: 75%;
-      transform: translate(-50%, -50%);
-      opacity: 0;
-      filter: brightness(0.5);
-    `;
-    container.appendChild(iconEl);
 
-    // Create accent lines (aiming sights)
-    const lineElements = [0, 1].map(() => {
-      const lineEl = document.createElement("div");
-      lineEl.style.cssText = `
-        position: absolute;
-        background-color: ${colors.accent};
-        opacity: 0;
-      `;
-      container.appendChild(lineEl);
-      return lineEl;
-    });
+    const lineElements = [0, 1].map(() =>
+      createElement(
+        "div",
+        {
+          position: "absolute",
+          backgroundColor: colors.accent,
+          opacity: "0",
+        },
+        container
+      )
+    );
 
-    // Create circular sight element
-    const circleEl = document.createElement("div");
-    circleEl.style.cssText = `
-      position: absolute;
-      width: ${7 * scaleFactor}vmin;
-      height: ${7 * scaleFactor}vmin;
-      border: ${0.7 * scaleFactor}vmin solid ${colors.accent};
-      border-radius: 50%;
-      left: 50%;
-      top: 75%;
-      transform: translate(-50%, -50%);
-      opacity: 0;
-    `;
-    container.appendChild(circleEl);
+    const circleEl = createElement(
+      "div",
+      {
+        position: "absolute",
+        width: `${7 * scaleFactor}vmin`,
+        height: `${7 * scaleFactor}vmin`,
+        border: `${0.7 * scaleFactor}vmin solid ${colors.accent}`,
+        borderRadius: "50%",
+        left: "50%",
+        top: "75%",
+        transform: "translate(-50%, -50%)",
+        opacity: "0",
+      },
+      container
+    );
 
-    // Animation timeline
     const tl = gsap.timeline({ onComplete: () => setAnimationComplete(true) });
 
-    // Animate M.A.N. letters
     tl.to(letterElements, {
       opacity: 1,
       duration: 0.5,
       stagger: 0.2,
       ease: "power2.inOut",
     }).to(letterElements, {
-      y: `-${3 * scaleFactor}vmin`,
-      duration: 0.5,
-      stagger: 0.2,
-      ease: "power2.inOut",
-    });
-
-    // Animate words
-    tl.to(wordElements, {
-      opacity: 1,
       y: `-${2 * scaleFactor}vmin`,
       duration: 0.5,
       stagger: 0.2,
       ease: "power2.inOut",
     });
 
-    // Animate icon
+    tl.to(
+      wordElements,
+      {
+        opacity: 1,
+        duration: 0.5,
+        stagger: 0.2,
+        ease: "power2.inOut",
+      },
+      "-=0.5"
+    );
+
     tl.to(iconEl, {
       opacity: 1,
       duration: 0.5,
       ease: "power2.inOut",
     });
 
-    // Animate accent lines (aiming sights)
     tl.to(
       lineElements[0],
       {
@@ -167,9 +189,9 @@ export default function MotionDesignMANAnimation() {
       lineElements[1],
       {
         opacity: 1,
-        height: "50%",
+        height: "35%",
         left: "50%",
-        top: "50%",
+        top: "57.5%",
         width: "2px",
         duration: 0.5,
         ease: "power2.inOut",
@@ -177,7 +199,6 @@ export default function MotionDesignMANAnimation() {
       "-=0.3"
     );
 
-    // Animate circular sight element
     tl.to(
       circleEl,
       {
@@ -189,10 +210,8 @@ export default function MotionDesignMANAnimation() {
       "-=0.3"
     );
 
-    // Hold the composition
     tl.to({}, { duration: 2 });
 
-    // Cleanup
     return () => {
       tl.kill();
     };
@@ -226,13 +245,18 @@ export default function MotionDesignMANAnimation() {
 
   return (
     <div
-      className={`${montserrat.className} min-h-screen bg-[#1a1a1a] text-white`}
+      className={`${montserrat.variable} font-sans min-h-screen bg-gray-900 text-white`}
     >
       <div
         ref={containerRef}
         className="relative w-full h-screen overflow-hidden"
         aria-label="Motion design animation for Metrosexual Awareness Night (M.A.N.)"
       >
+        {!animationComplete && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-pink-500"></div>
+          </div>
+        )}
         {animationComplete && (
           <div
             ref={spotlightRef}
@@ -242,48 +266,67 @@ export default function MotionDesignMANAnimation() {
       </div>
 
       {animationComplete && (
-        <div className="bg-[#2a2a2a] py-16 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl mb-8 text-[#ff4081]">Event Details</h2>
+        <section className="bg-black py-16 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl mb-12 text-gray-300 border-b border-gray-700 pb-4">
+              EVENT DETAILS
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-2xl mb-4 text-[#e0e0e0]">The Essentials</h3>
-                <p className="mb-2">
-                  <strong>Date:</strong> September 15th, 2024
-                </p>
-                <p className="mb-2">
-                  <strong>Time:</strong> 8 PM - 2 AM
-                </p>
-                <p className="mb-2">
-                  <strong>Venue:</strong> The Whammy Bar
-                </p>
-                <p className="mb-2">
-                  <strong>Cost:</strong> $15
-                </p>
-                <p>
-                  <strong>Dress Code:</strong> Metrosexual Chic
-                </p>
-              </div>
-              <div>
-                <h3 className="text-2xl mb-4 text-[#e0e0e0]">
-                  About the Hosts
+              <div className="bg-gray-900 p-6 border border-gray-800 rounded-lg shadow-lg">
+                <h3 className="text-xl mb-6 text-gray-400 border-b border-gray-700 pb-2">
+                  THE ESSENTIALS
                 </h3>
-                <p className="mb-4">
-                  Join us for an unforgettable night curated by the dynamic duo:
+                <ul className="space-y-4 text-sm">
+                  {[
+                    ["DATE", "SEP 15, 2024"],
+                    ["TIME", "20:00-02:00"],
+                    ["VENUE", "WHAMMY BAR"],
+                    ["COST", "$15.00"],
+                    ["DRESS", "METRO CHIC"],
+                  ].map(([label, value]) => (
+                    <li
+                      key={label}
+                      className="flex justify-between items-center"
+                    >
+                      <span className="text-gray-500">{label}</span>
+                      <span className="text-gray-300">{value}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-gray-900 p-6 border border-gray-800 rounded-lg shadow-lg">
+                <h3 className="text-xl mb-6 text-gray-400 border-b border-gray-700 pb-2">
+                  ABOUT THE HOSTS
+                </h3>
+                <p className="mb-6 text-gray-300 text-sm">
+                  JOIN US FOR A NIGHT CURATED BY:
                 </p>
-                <p className="mb-2">
-                  <strong>Thom Haha</strong> - Grooming Guru
-                </p>
-                <p>
-                  <strong>Maxwell Young</strong> - Style Savant
-                </p>
+                <ul className="space-y-4 text-sm">
+                  {[
+                    ["THOM HAHA", "GROOM GURU"],
+                    ["MAX YOUNG", "STYLE PRO"],
+                  ].map(([name, title]) => (
+                    <li
+                      key={name}
+                      className="flex justify-between items-center"
+                    >
+                      <span className="text-gray-500">{name}</span>
+                      <span className="text-gray-300">{title}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-            <button className="mt-12 bg-[#ff4081] text-white py-3 px-6 text-lg rounded-full hover:bg-[#ff679b] transition-colors duration-300">
-              Get Your Tickets Now
-            </button>
+            <div className="mt-12 text-center">
+              <button
+                className="bg-gray-800 text-gray-300 py-3 px-8 text-sm hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 border border-gray-700 rounded-full"
+                aria-label="Purchase tickets for the event"
+              >
+                GET YOUR TICKETS NOW
+              </button>
+            </div>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );
