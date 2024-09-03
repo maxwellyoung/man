@@ -65,7 +65,7 @@ export default function MotionDesignMANAnimation() {
           color: colors.primary,
           opacity: "0",
           left: `${25 + 25 * index}%`,
-          top: "40%",
+          top: "30%", // Changed from 40% to 30%
           transform: "translate(-50%, -50%)",
           fontFamily: "var(--font-montserrat)",
           padding: `${2 * scaleFactor}vmin`,
@@ -85,7 +85,7 @@ export default function MotionDesignMANAnimation() {
           color: colors.secondary,
           opacity: "0",
           left: `${25 + 25 * index}%`,
-          top: "60%",
+          top: "45%", // Changed from 60% to 45%
           transform: "translate(-50%, -50%)",
           fontFamily: "var(--font-montserrat)",
           textAlign: "center",
@@ -142,6 +142,89 @@ export default function MotionDesignMANAnimation() {
       container
     );
 
+    const manFigure = createElement(
+      "div",
+      {
+        position: "absolute",
+        width: `${30 * scaleFactor}vmin`,
+        height: `${50 * scaleFactor}vmin`,
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+      },
+      container
+    );
+
+    const createShootingEffect = (e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = manFigure.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const hole = createElement(
+        "div",
+        {
+          position: "absolute",
+          width: "10px",
+          height: "10px",
+          borderRadius: "50%",
+          backgroundColor: "#ff0000",
+          left: `${x}px`,
+          top: `${y}px`,
+          transform: "translate(-50%, -50%)",
+          zIndex: "10",
+        },
+        manFigure
+      );
+
+      gsap.to(hole, {
+        scale: 3,
+        opacity: 0.7,
+        duration: 0.3,
+      });
+
+      const createBloodDrop = () => {
+        const blood = createElement(
+          "div",
+          {
+            position: "absolute",
+            width: "3px",
+            height: "3px",
+            borderRadius: "50%",
+            backgroundColor: "#ff0000",
+            left: `${x}px`,
+            top: `${y}px`,
+            transform: "translate(-50%, -50%)",
+            zIndex: "11",
+          },
+          manFigure
+        );
+
+        gsap.to(blood, {
+          y: manFigure.clientHeight - y,
+          opacity: 0,
+          duration: 2,
+          ease: "power1.in",
+          onComplete: () => {
+            manFigure.removeChild(blood);
+          },
+        });
+      };
+
+      // Initial blood drop
+      createBloodDrop();
+
+      // Continuous dripping
+      const drippingInterval = setInterval(createBloodDrop, 500);
+
+      // Store the interval ID in a data attribute on the hole element
+      hole.dataset.drippingInterval = drippingInterval.toString();
+    };
+
+    manFigure.addEventListener(
+      "click",
+      createShootingEffect as unknown as EventListener
+    );
+
     const tl = gsap.timeline({ onComplete: () => setAnimationComplete(true) });
 
     tl.to(letterElements, {
@@ -189,9 +272,9 @@ export default function MotionDesignMANAnimation() {
       lineElements[1],
       {
         opacity: 1,
-        height: "35%",
+        height: "45%", // Increased from 35% to 45%
         left: "50%",
-        top: "57.5%",
+        top: "50%", // Changed from 57.5% to 50%
         width: "2px",
         duration: 0.5,
         ease: "power2.inOut",
@@ -214,6 +297,16 @@ export default function MotionDesignMANAnimation() {
 
     return () => {
       tl.kill();
+      manFigure.removeEventListener(
+        "click",
+        createShootingEffect as unknown as EventListener
+      );
+      // Clear all dripping intervals
+      manFigure.querySelectorAll("[data-dripping-interval]").forEach((hole) => {
+        clearInterval(
+          parseInt((hole as HTMLElement).dataset.drippingInterval || "0", 10)
+        );
+      });
     };
   }, []);
 
@@ -249,8 +342,8 @@ export default function MotionDesignMANAnimation() {
     >
       <div
         ref={containerRef}
-        className="relative w-full h-screen overflow-hidden"
-        aria-label="Motion design animation for Metrosexual Awareness Night (M.A.N.)"
+        className="relative w-full h-screen overflow-hidden cursor-gun"
+        aria-label="Interactive animation for Metrosexual Awareness Night (M.A.N.)"
       >
         {!animationComplete && (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -266,23 +359,23 @@ export default function MotionDesignMANAnimation() {
       </div>
 
       {animationComplete && (
-        <section className="bg-black py-16 px-4">
+        <section className="bg-black py-24 px-6">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl mb-12 text-gray-300 border-b border-gray-700 pb-4">
+            <h2 className="text-3xl mb-16 text-gray-300 border-b border-gray-700 pb-4">
               EVENT DETAILS
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-gray-900 p-6 border border-gray-800 rounded-lg shadow-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+              <div className="bg-gray-900 p-8 border border-gray-800 rounded-lg shadow-lg">
                 <h3 className="text-xl mb-6 text-gray-400 border-b border-gray-700 pb-2">
                   THE ESSENTIALS
                 </h3>
-                <ul className="space-y-4 text-sm">
+                <ul className="space-y-6 text-sm">
                   {[
                     ["DATE", "SEP 15, 2024"],
                     ["TIME", "20:00-02:00"],
                     ["VENUE", "WHAMMY BAR"],
                     ["COST", "$15.00"],
-                    ["DRESS", "METRO CHIC"],
+                    ["DRESS", "METROSEXUAL"],
                   ].map(([label, value]) => (
                     <li
                       key={label}
@@ -294,17 +387,17 @@ export default function MotionDesignMANAnimation() {
                   ))}
                 </ul>
               </div>
-              <div className="bg-gray-900 p-6 border border-gray-800 rounded-lg shadow-lg">
+              <div className="bg-gray-900 p-8 border border-gray-800 rounded-lg shadow-lg">
                 <h3 className="text-xl mb-6 text-gray-400 border-b border-gray-700 pb-2">
                   ABOUT THE HOSTS
                 </h3>
                 <p className="mb-6 text-gray-300 text-sm">
                   JOIN US FOR A NIGHT CURATED BY:
                 </p>
-                <ul className="space-y-4 text-sm">
+                <ul className="space-y-6 text-sm">
                   {[
-                    ["THOM HAHA", "GROOM GURU"],
-                    ["MAX YOUNG", "STYLE PRO"],
+                    ["THOM HAHA", "GROOMING GURU"],
+                    ["MAX YOUNG", "LOCAL MUSICIAN"],
                   ].map(([name, title]) => (
                     <li
                       key={name}
@@ -317,9 +410,9 @@ export default function MotionDesignMANAnimation() {
                 </ul>
               </div>
             </div>
-            <div className="mt-12 text-center">
+            <div className="mt-16 text-center">
               <button
-                className="bg-gray-800 text-gray-300 py-3 px-8 text-sm hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 border border-gray-700 rounded-full"
+                className="bg-gray-800 text-gray-300 py-4 px-8 text-sm hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 border border-gray-700 rounded-full"
                 aria-label="Purchase tickets for the event"
               >
                 GET YOUR TICKETS NOW
@@ -328,6 +421,12 @@ export default function MotionDesignMANAnimation() {
           </div>
         </section>
       )}
+
+      <style jsx global>{`
+        .cursor-gun {
+          cursor: url("/path-to-your-gun-cursor-image.png"), auto;
+        }
+      `}</style>
     </div>
   );
 }
