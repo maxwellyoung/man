@@ -1,0 +1,59 @@
+/* MetrosexualAwarenessAnimation.module.css */
+.container {
+  width: 100%;
+  height: 100vh;
+  background-color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.manLetter {
+  position: absolute;
+  font-size: 20vw;
+  font-weight: 900;
+  opacity: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.word {
+  position: absolute;
+  font-size: 8vw;
+  font-weight: 900;
+  opacity: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.icon {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  filter: invert(1);
+}
+
+.groomingItem {
+  position: absolute;
+  font-size: 8vw;
+  opacity: 0;
+  top: 10%;
+}
+
+.tagline {
+  position: absolute;
+  bottom: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #000000;
+  font-size: 4vw;
+  opacity: 0;
+  text-align: center;
+  width: 100%;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
