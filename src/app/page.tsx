@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { montserrat } from "./fonts";
 
 export default function MotionDesignMANAnimation() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef<HTMLDivElement>(null);
+  const [animationComplete, setAnimationComplete] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -39,12 +41,12 @@ export default function MotionDesignMANAnimation() {
       letterEl.textContent = letter;
       letterEl.style.cssText = `
         position: absolute;
-        font-size: ${18 * scaleFactor}vmin;
+        font-size: ${28 * scaleFactor}vmin;
         font-weight: 700;
         color: ${colors.primary};
         opacity: 0;
         left: ${25 + 25 * index}%;
-        top: 25%;
+        top: 30%;
         transform: translate(-50%, -50%);
         font-family: 'Montserrat', sans-serif;
       `;
@@ -59,12 +61,12 @@ export default function MotionDesignMANAnimation() {
       wordEl.textContent = word;
       wordEl.style.cssText = `
         position: absolute;
-        font-size: ${3.5 * scaleFactor}vmin;
+        font-size: ${4.5 * scaleFactor}vmin;
         font-weight: 300;
         color: ${colors.secondary};
         opacity: 0;
         left: ${25 + 25 * index}%;
-        top: 45%;
+        top: 50%;
         transform: translate(-50%, -50%);
         font-family: 'Montserrat', sans-serif;
       `;
@@ -79,10 +81,10 @@ export default function MotionDesignMANAnimation() {
     iconEl.alt = "Unisex public toilet icon";
     iconEl.style.cssText = `
       position: absolute;
-      width: ${14 * scaleFactor}vmin;
+      width: ${22 * scaleFactor}vmin;
       height: auto;
       left: 50%;
-      top: 70%;
+      top: 75%;
       transform: translate(-50%, -50%);
       opacity: 0;
       filter: brightness(0.5);
@@ -105,34 +107,19 @@ export default function MotionDesignMANAnimation() {
     const circleEl = document.createElement("div");
     circleEl.style.cssText = `
       position: absolute;
-      width: ${4 * scaleFactor}vmin;
-      height: ${4 * scaleFactor}vmin;
-      border: ${0.5 * scaleFactor}vmin solid ${colors.accent};
+      width: ${7 * scaleFactor}vmin;
+      height: ${7 * scaleFactor}vmin;
+      border: ${0.7 * scaleFactor}vmin solid ${colors.accent};
       border-radius: 50%;
       left: 50%;
-      top: 70%;
+      top: 75%;
       transform: translate(-50%, -50%);
       opacity: 0;
     `;
     container.appendChild(circleEl);
 
-    // Create spotlight
-    const spotlightEl = document.createElement("div");
-    spotlightEl.style.cssText = `
-      position: absolute;
-      width: ${30 * scaleFactor}vmin;
-      height: ${30 * scaleFactor}vmin;
-      background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
-      left: 50%;
-      top: 70%;
-      transform: translate(-50%, -50%) scale(0);
-      opacity: 0;
-      mix-blend-mode: screen;
-    `;
-    container.appendChild(spotlightEl);
-
     // Animation timeline
-    const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+    const tl = gsap.timeline({ onComplete: () => setAnimationComplete(true) });
 
     // Animate M.A.N. letters
     tl.to(letterElements, {
@@ -157,24 +144,20 @@ export default function MotionDesignMANAnimation() {
     });
 
     // Animate icon
-    tl.to(
-      iconEl,
-      {
-        opacity: 1,
-        duration: 0.5,
-        ease: "power2.inOut",
-      },
-      "-=0.5"
-    );
+    tl.to(iconEl, {
+      opacity: 1,
+      duration: 0.5,
+      ease: "power2.inOut",
+    });
 
     // Animate accent lines (aiming sights)
     tl.to(
       lineElements[0],
       {
         opacity: 1,
-        width: "80%",
-        left: "10%",
-        top: "70%",
+        width: "70%",
+        left: "15%",
+        top: "75%",
         height: "2px",
         duration: 0.5,
         ease: "power2.inOut",
@@ -184,7 +167,7 @@ export default function MotionDesignMANAnimation() {
       lineElements[1],
       {
         opacity: 1,
-        height: "40%",
+        height: "50%",
         left: "50%",
         top: "50%",
         width: "2px",
@@ -206,42 +189,8 @@ export default function MotionDesignMANAnimation() {
       "-=0.3"
     );
 
-    // Animate spotlight and icon brightening
-    tl.to(spotlightEl, {
-      opacity: 1,
-      scale: 1,
-      duration: 1,
-      ease: "power2.inOut",
-    }).to(
-      iconEl,
-      {
-        filter: "brightness(1)",
-        duration: 1,
-        ease: "power2.inOut",
-      },
-      "-=1"
-    );
-
     // Hold the composition
     tl.to({}, { duration: 2 });
-
-    // Fade out everything
-    tl.to(
-      [
-        ...letterElements,
-        ...wordElements,
-        iconEl,
-        ...lineElements,
-        circleEl,
-        spotlightEl,
-      ],
-      {
-        opacity: 0,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: "power2.inOut",
-      }
-    );
 
     // Cleanup
     return () => {
@@ -249,20 +198,93 @@ export default function MotionDesignMANAnimation() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (spotlightRef.current && containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        spotlightRef.current.style.background = `
+          radial-gradient(
+            circle at ${x}px ${y}px,
+            rgba(255, 255, 255, 0.1) 0%,
+            rgba(255, 255, 255, 0.05) 20%,
+            rgba(255, 255, 255, 0) 50%
+          )
+        `;
+      }
+    };
+
+    if (animationComplete) {
+      window.addEventListener("mousemove", handleMouseMove);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [animationComplete]);
+
   return (
-    <div className={montserrat.className}>
+    <div
+      className={`${montserrat.className} min-h-screen bg-[#1a1a1a] text-white`}
+    >
       <div
         ref={containerRef}
-        style={{
-          width: "100%",
-          height: "100%",
-          minHeight: "400px",
-          backgroundColor: "#1a1a1a",
-          position: "relative",
-          overflow: "hidden",
-        }}
+        className="relative w-full h-screen overflow-hidden"
         aria-label="Motion design animation for Metrosexual Awareness Night (M.A.N.)"
-      />
+      >
+        {animationComplete && (
+          <div
+            ref={spotlightRef}
+            className="absolute inset-0 pointer-events-none"
+          />
+        )}
+      </div>
+
+      {animationComplete && (
+        <div className="bg-[#2a2a2a] py-16 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl mb-8 text-[#ff4081]">Event Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-2xl mb-4 text-[#e0e0e0]">The Essentials</h3>
+                <p className="mb-2">
+                  <strong>Date:</strong> September 15th, 2024
+                </p>
+                <p className="mb-2">
+                  <strong>Time:</strong> 8 PM - 2 AM
+                </p>
+                <p className="mb-2">
+                  <strong>Venue:</strong> The Whammy Bar
+                </p>
+                <p className="mb-2">
+                  <strong>Cost:</strong> $15
+                </p>
+                <p>
+                  <strong>Dress Code:</strong> Metrosexual Chic
+                </p>
+              </div>
+              <div>
+                <h3 className="text-2xl mb-4 text-[#e0e0e0]">
+                  About the Hosts
+                </h3>
+                <p className="mb-4">
+                  Join us for an unforgettable night curated by the dynamic duo:
+                </p>
+                <p className="mb-2">
+                  <strong>Thom Haha</strong> - Grooming Guru
+                </p>
+                <p>
+                  <strong>Maxwell Young</strong> - Style Savant
+                </p>
+              </div>
+            </div>
+            <button className="mt-12 bg-[#ff4081] text-white py-3 px-6 text-lg rounded-full hover:bg-[#ff679b] transition-colors duration-300">
+              Get Your Tickets Now
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
