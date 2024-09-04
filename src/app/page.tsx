@@ -11,8 +11,8 @@ const montserrat = Montserrat({
 
 export default function MotionDesignMANAnimation() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const spotlightRef = useRef<HTMLDivElement>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
+  const [sightPosition, setSightPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -60,12 +60,12 @@ export default function MotionDesignMANAnimation() {
         "div",
         {
           position: "absolute",
-          fontSize: `${28 * scaleFactor}vmin`,
+          fontSize: `${32 * scaleFactor}vmin`,
           fontWeight: "700",
           color: colors.primary,
           opacity: "0",
           left: `${25 + 25 * index}%`,
-          top: "30%", // Changed from 40% to 30%
+          top: "30%",
           transform: "translate(-50%, -50%)",
           fontFamily: "var(--font-montserrat)",
           padding: `${2 * scaleFactor}vmin`,
@@ -80,12 +80,12 @@ export default function MotionDesignMANAnimation() {
         "div",
         {
           position: "absolute",
-          fontSize: `${4 * scaleFactor}vmin`,
+          fontSize: `${3.5 * scaleFactor}vmin`,
           fontWeight: "500",
           color: colors.secondary,
           opacity: "0",
           left: `${25 + 25 * index}%`,
-          top: "45%", // Changed from 60% to 45%
+          top: "45%",
           transform: "translate(-50%, -50%)",
           fontFamily: "var(--font-montserrat)",
           textAlign: "center",
@@ -103,7 +103,7 @@ export default function MotionDesignMANAnimation() {
         width: `${20 * scaleFactor}vmin`,
         height: "auto",
         left: "50%",
-        top: "75%",
+        top: "80%",
         transform: "translate(-50%, -50%)",
         opacity: "0",
         filter: "brightness(0.5)",
@@ -135,28 +135,18 @@ export default function MotionDesignMANAnimation() {
         border: `${0.7 * scaleFactor}vmin solid ${colors.accent}`,
         borderRadius: "50%",
         left: "50%",
-        top: "75%",
+        top: "80%",
         transform: "translate(-50%, -50%)",
         opacity: "0",
       },
       container
     );
 
-    const manFigure = createElement(
-      "div",
-      {
-        position: "absolute",
-        width: `${30 * scaleFactor}vmin`,
-        height: `${50 * scaleFactor}vmin`,
-        left: "50%",
-        top: "50%",
-        transform: "translate(-50%, -50%)",
-      },
-      container
-    );
+    let isMouseDown = false;
+    let shootingInterval: NodeJS.Timeout | null = null;
 
-    const createShootingEffect = (e: React.MouseEvent<HTMLDivElement>) => {
-      const rect = manFigure.getBoundingClientRect();
+    const createShootingEffect = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
@@ -173,7 +163,7 @@ export default function MotionDesignMANAnimation() {
           transform: "translate(-50%, -50%)",
           zIndex: "10",
         },
-        manFigure
+        container
       );
 
       gsap.to(hole, {
@@ -196,34 +186,59 @@ export default function MotionDesignMANAnimation() {
             transform: "translate(-50%, -50%)",
             zIndex: "11",
           },
-          manFigure
+          container
         );
 
         gsap.to(blood, {
-          y: manFigure.clientHeight - y,
+          y: containerHeight - y,
           opacity: 0,
           duration: 2,
           ease: "power1.in",
           onComplete: () => {
-            manFigure.removeChild(blood);
+            if (container.contains(blood)) {
+              container.removeChild(blood);
+            }
           },
         });
       };
 
-      // Initial blood drop
       createBloodDrop();
-
-      // Continuous dripping
       const drippingInterval = setInterval(createBloodDrop, 500);
-
-      // Store the interval ID in a data attribute on the hole element
-      hole.dataset.drippingInterval = drippingInterval.toString();
+      (hole as HTMLElement).dataset.drippingInterval =
+        drippingInterval.toString();
     };
 
-    manFigure.addEventListener(
-      "click",
-      createShootingEffect as unknown as EventListener
-    );
+    const handleMouseDown = (e: MouseEvent) => {
+      isMouseDown = true;
+      createShootingEffect(e);
+      shootingInterval = setInterval(() => {
+        if (isMouseDown) {
+          createShootingEffect(e);
+        }
+      }, 100);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isMouseDown) {
+        createShootingEffect(e);
+      }
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      setSightPosition({ x, y });
+    };
+
+    const handleMouseUp = () => {
+      isMouseDown = false;
+      if (shootingInterval) {
+        clearInterval(shootingInterval);
+      }
+    };
+
+    container.addEventListener("mousedown", handleMouseDown);
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseup", handleMouseUp);
+    container.addEventListener("mouseleave", handleMouseUp);
 
     const tl = gsap.timeline({ onComplete: () => setAnimationComplete(true) });
 
@@ -262,7 +277,7 @@ export default function MotionDesignMANAnimation() {
         opacity: 1,
         width: "70%",
         left: "15%",
-        top: "75%",
+        top: "80%",
         height: "2px",
         duration: 0.5,
         ease: "power2.inOut",
@@ -272,9 +287,9 @@ export default function MotionDesignMANAnimation() {
       lineElements[1],
       {
         opacity: 1,
-        height: "45%", // Increased from 35% to 45%
+        height: "55%",
         left: "50%",
-        top: "50%", // Changed from 57.5% to 50%
+        top: "42.5%",
         width: "2px",
         duration: 0.5,
         ease: "power2.inOut",
@@ -297,52 +312,28 @@ export default function MotionDesignMANAnimation() {
 
     return () => {
       tl.kill();
-      manFigure.removeEventListener(
-        "click",
-        createShootingEffect as unknown as EventListener
-      );
-      // Clear all dripping intervals
-      manFigure.querySelectorAll("[data-dripping-interval]").forEach((hole) => {
+      container.removeEventListener("mousedown", handleMouseDown);
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseup", handleMouseUp);
+      container.removeEventListener("mouseleave", handleMouseUp);
+      container.querySelectorAll("[data-dripping-interval]").forEach((hole) => {
         clearInterval(
           parseInt((hole as HTMLElement).dataset.drippingInterval || "0", 10)
         );
       });
+      if (shootingInterval) {
+        clearInterval(shootingInterval);
+      }
     };
   }, []);
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (spotlightRef.current && containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        spotlightRef.current.style.background = `
-          radial-gradient(
-            circle at ${x}px ${y}px,
-            rgba(255, 255, 255, 0.1) 0%,
-            rgba(255, 255, 255, 0.05) 20%,
-            rgba(255, 255, 255, 0) 50%
-          )
-        `;
-      }
-    };
-
-    if (animationComplete) {
-      window.addEventListener("mousemove", handleMouseMove);
-    }
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, [animationComplete]);
-
   return (
     <div
-      className={`${montserrat.variable} font-sans min-h-screen bg-gray-900 text-white`}
+      className={`${montserrat.variable} font-sans min-h-screen bg-gray-900 text-white select-none`}
     >
       <div
         ref={containerRef}
-        className="relative w-full h-screen overflow-hidden cursor-gun"
+        className="relative w-full h-screen overflow-hidden cursor-none"
         aria-label="Interactive animation for Metrosexual Awareness Night (M.A.N.)"
       >
         {!animationComplete && (
@@ -352,14 +343,28 @@ export default function MotionDesignMANAnimation() {
         )}
         {animationComplete && (
           <div
-            ref={spotlightRef}
-            className="absolute inset-0 pointer-events-none"
-          />
+            className="sight absolute pointer-events-none"
+            style={{
+              left: `${sightPosition.x}px`,
+              top: `${sightPosition.y}px`,
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <div className="w-8 h-8 border-2 border-red-500 rounded-full"></div>
+            <div
+              className="absolute left-1/2 top-1/2 w-1 h-8 bg-red-500"
+              style={{ transform: "translate(-50%, -50%)" }}
+            ></div>
+            <div
+              className="absolute left-1/2 top-1/2 w-8 h-1 bg-red-500"
+              style={{ transform: "translate(-50%, -50%)" }}
+            ></div>
+          </div>
         )}
       </div>
 
       {animationComplete && (
-        <section className="bg-black py-24 px-6">
+        <section className="bg-black py-24 px-6 select-none">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl mb-16 text-gray-300 border-b border-gray-700 pb-4">
               EVENT DETAILS
@@ -423,8 +428,11 @@ export default function MotionDesignMANAnimation() {
       )}
 
       <style jsx global>{`
-        .cursor-gun {
-          cursor: url("/path-to-your-gun-cursor-image.png"), auto;
+        * {
+          user-select: none;
+        }
+        .cursor-none {
+          cursor: none;
         }
       `}</style>
     </div>
