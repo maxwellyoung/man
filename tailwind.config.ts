@@ -8,13 +8,17 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      fontFamily: {
+        goldeneye: ["GoldenEye", "sans-serif"],
+        authentic: ["Authentic-Sans", "sans-serif"],
+      },
+      colors: {
+        background: "#1e1e1e",
+        border: "#4a4a4a",
       },
     },
   },
   plugins: [],
 };
+
 export default config;

@@ -1,46 +1,300 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { gsap } from "gsap";
-import { Montserrat } from "next/font/google";
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-montserrat",
-});
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  DollarSign,
+  Shirt,
+  Info,
+  Volume2,
+  VolumeX,
+  X,
+  Users,
+  Ticket,
+  Target,
+} from "lucide-react";
+import * as THREE from "three";
 
 export default function MotionDesignMANAnimation() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const spotlightRef = useRef<HTMLDivElement>(null);
+  const audioRefs = useRef<(HTMLAudioElement | null)[]>([]);
+  const currentAudioIndex = useRef(0);
+  const cockAudioRef = useRef<HTMLAudioElement>(null);
+  const manFigureRef = useRef<HTMLDivElement>(null);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [sightPosition, setSightPosition] = useState({ x: 0, y: 0 });
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isMouseDown, setIsMouseDown] = useState(false);
+  const [lastCockTime, setLastCockTime] = useState(0);
+  const [currentCockSound, setCurrentCockSound] = useState(0);
+  const [lastShootTime, setLastShootTime] = useState(0);
+  const [currentGun, setCurrentGun] = useState(0);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const colors = {
+  const colors = useMemo(
+    () => ({
       background: "#1a1a1a",
       primary: "#e0e0e0",
       secondary: "#b0b0b0",
       accent: "#ff4081",
-    };
+    }),
+    []
+  );
 
-    const container = containerRef.current;
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const scaleFactor = Math.min(containerWidth / 1000, containerHeight / 800);
+  const cockSounds = useMemo(
+    () => ["/sounds/cock.wav", "/sounds/cock2.wav", "/sounds/cock3.wav"],
+    []
+  );
 
-    const createElement = (
-      type: "div" | "img",
+  const guns = useMemo(
+    () => [
+      {
+        name: "Pistol",
+        cooldown: 200,
+        damage: 1,
+        sound: "/sounds/gunshot2.wav",
+      },
+      {
+        name: "Shotgun",
+        cooldown: 800,
+        damage: 3,
+        sound: "/sounds/gunshot5.wav",
+      },
+      {
+        name: "Machine Gun",
+        cooldown: 50,
+        damage: 0.5,
+        sound: "/sounds/gunshot4.wav",
+      },
+    ],
+    []
+  );
+
+  const createElement = useCallback(
+    (
+      type: string,
       styles: Partial<CSSStyleDeclaration>,
       parent: HTMLElement,
       content?: string
-    ) => {
+    ): HTMLElement => {
       const element = document.createElement(type);
       Object.assign(element.style, styles);
       if (content) element.textContent = content;
       parent.appendChild(element);
       return element;
+    },
+    []
+  );
+
+  const createMuzzleFlash = useCallback(
+    (x: number, y: number) => {
+      if (!containerRef.current) return;
+      const container = containerRef.current;
+      const flash = createElement(
+        "div",
+        {
+          position: "absolute",
+          width: "20px",
+          height: "20px",
+          borderRadius: "50%",
+          backgroundColor: "#ffff00",
+          boxShadow: "0 0 10px 5px rgba(255, 255, 0, 0.7)",
+          left: `${x}px`,
+          top: `${y}px`,
+          transform: "translate(-50%, -50%)",
+          zIndex: "12",
+        },
+        container
+      );
+
+      gsap.to(flash, {
+        scale: 1.5,
+        opacity: 0,
+        duration: 0.1,
+        onComplete: () => {
+          if (container.contains(flash)) {
+            container.removeChild(flash);
+          }
+        },
+      });
+    },
+    [createElement]
+  );
+
+  const playGunshot = useCallback(() => {
+    const audio = audioRefs.current[currentGun];
+    if (audio && !isMuted) {
+      audio.currentTime = 0;
+      audio.play();
+    }
+  }, [currentGun, isMuted]);
+
+  const createShootingEffect = useCallback(
+    (e: MouseEvent) => {
+      if (!containerRef.current) return;
+
+      const container = containerRef.current;
+      const currentTime = Date.now();
+      if (currentTime - lastShootTime < guns[currentGun].cooldown) return;
+      setLastShootTime(currentTime);
+
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      createMuzzleFlash(x, y);
+      playGunshot();
+
+      const hole = createElement(
+        "div",
+        {
+          position: "absolute",
+          width: `${10 * guns[currentGun].damage}px`,
+          height: `${10 * guns[currentGun].damage}px`,
+          borderRadius: "50%",
+          backgroundColor: "#000000",
+          boxShadow: "inset 0 0 4px 2px rgba(255, 0, 0, 0.5)",
+          left: `${x}px`,
+          top: `${y}px`,
+          transform: "translate(-50%, -50%) scale(0)",
+          zIndex: "30",
+        },
+        container
+      );
+
+      gsap.to(hole, {
+        scale: 1,
+        duration: 0.2,
+        ease: "back.out(1.7)",
+      });
+
+      const createBloodDrop = () => {
+        if (!containerRef.current) return;
+        const container = containerRef.current;
+        const blood = createElement(
+          "div",
+          {
+            position: "absolute",
+            width: "3px",
+            height: "3px",
+            borderRadius: "50%",
+            backgroundColor: "#ff0000",
+            left: `${x + (Math.random() - 0.5) * 10}px`,
+            top: `${y}px`,
+            transform: "translate(-50%, -50%)",
+            zIndex: "31",
+          },
+          container
+        );
+
+        gsap.to(blood, {
+          y: `+=${window.innerHeight}`,
+          x: `+=${(Math.random() - 0.5) * 50}`,
+          opacity: 0,
+          duration: 4 + Math.random() * 2,
+          ease: "power1.in",
+          onComplete: () => {
+            if (container.contains(blood)) {
+              container.removeChild(blood);
+            }
+          },
+        });
+      };
+
+      // Create initial blood drops
+      for (let i = 0; i < 5; i++) {
+        createBloodDrop();
+      }
+
+      // Create a continuous dripping effect
+      const drippingInterval = setInterval(() => {
+        if (Math.random() < 0.7) {
+          // 70% chance to create a new drop
+          createBloodDrop();
+        }
+      }, 200);
+
+      // Store the interval ID on the hole element
+      hole.dataset.drippingInterval = drippingInterval.toString();
+
+      // Clean up the dripping effect after 10 seconds
+      setTimeout(() => {
+        clearInterval(drippingInterval);
+        if (container.contains(hole)) {
+          container.removeChild(hole);
+        }
+      }, 10000);
+    },
+    [
+      createElement,
+      createMuzzleFlash,
+      playGunshot,
+      currentGun,
+      guns,
+      lastShootTime,
+      setLastShootTime,
+    ]
+  );
+
+  const changeGun = useCallback(() => {
+    setCurrentGun((prevGun) => (prevGun + 1) % guns.length);
+  }, [guns.length]);
+
+  useEffect(() => {
+    if (!containerRef.current || !manFigureRef.current) return;
+
+    const container = containerRef.current;
+    const manFigure = manFigureRef.current;
+
+    let isMouseDown = false;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      isMouseDown = true;
+      createShootingEffect(e);
     };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isMouseDown) {
+        createShootingEffect(e);
+      }
+    };
+
+    const handleMouseUp = () => {
+      isMouseDown = false;
+    };
+
+    container.addEventListener("mousedown", handleMouseDown);
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseup", handleMouseUp);
+    container.addEventListener("mouseleave", handleMouseUp);
+
+    return () => {
+      container.removeEventListener("mousedown", handleMouseDown);
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseup", handleMouseUp);
+      container.removeEventListener("mouseleave", handleMouseUp);
+    };
+  }, [createShootingEffect]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const scaleFactor = Math.min(containerWidth / 1000, containerHeight / 800);
 
     const bgEl = createElement(
       "div",
@@ -49,6 +303,8 @@ export default function MotionDesignMANAnimation() {
         width: "100%",
         height: "100%",
         backgroundColor: colors.background,
+        backgroundImage:
+          "radial-gradient(circle at center, #2a2a2a 0%, #1a1a1a 100%)",
       },
       container
     );
@@ -60,15 +316,17 @@ export default function MotionDesignMANAnimation() {
         "div",
         {
           position: "absolute",
-          fontSize: `${32 * scaleFactor}vmin`,
+          fontSize: `clamp(4rem, ${12 * scaleFactor}vw, 12rem)`,
           fontWeight: "700",
           color: colors.primary,
           opacity: "0",
           left: `${25 + 25 * index}%`,
-          top: "30%",
+          top: "15%",
           transform: "translate(-50%, -50%)",
-          fontFamily: "var(--font-montserrat)",
-          padding: `${2 * scaleFactor}vmin`,
+          fontFamily: "GoldenEye, sans-serif",
+          padding: `${1 * scaleFactor}vmin`,
+          userSelect: "none",
+          textShadow: "0 0 15px rgba(224, 224, 224, 0.7)",
         },
         container,
         letter
@@ -80,16 +338,18 @@ export default function MotionDesignMANAnimation() {
         "div",
         {
           position: "absolute",
-          fontSize: `${3.5 * scaleFactor}vmin`,
+          fontSize: `clamp(1.5rem, ${3 * scaleFactor}vw, 3rem)`,
           fontWeight: "500",
           color: colors.secondary,
           opacity: "0",
           left: `${25 + 25 * index}%`,
-          top: "45%",
+          top: "30%",
           transform: "translate(-50%, -50%)",
-          fontFamily: "var(--font-montserrat)",
+          fontFamily: "GoldenEye, sans-serif",
           textAlign: "center",
           width: "30%",
+          userSelect: "none",
+          textShadow: "0 0 10px rgba(176, 176, 176, 0.5)",
         },
         container,
         word
@@ -100,13 +360,13 @@ export default function MotionDesignMANAnimation() {
       "img",
       {
         position: "absolute",
-        width: `${20 * scaleFactor}vmin`,
+        width: `clamp(6rem, ${28 * scaleFactor}vw, 18rem)`,
         height: "auto",
         left: "50%",
-        top: "80%",
+        top: "65%",
         transform: "translate(-50%, -50%)",
         opacity: "0",
-        filter: "brightness(0.5)",
+        filter: "brightness(0.7) drop-shadow(0 0 15px rgba(255, 64, 129, 0.7))",
       },
       container
     ) as HTMLImageElement;
@@ -121,6 +381,7 @@ export default function MotionDesignMANAnimation() {
           position: "absolute",
           backgroundColor: colors.accent,
           opacity: "0",
+          boxShadow: "0 0 15px rgba(255, 64, 129, 0.7)",
         },
         container
       )
@@ -130,311 +391,432 @@ export default function MotionDesignMANAnimation() {
       "div",
       {
         position: "absolute",
-        width: `${7 * scaleFactor}vmin`,
-        height: `${7 * scaleFactor}vmin`,
-        border: `${0.7 * scaleFactor}vmin solid ${colors.accent}`,
+        width: `clamp(4rem, ${10 * scaleFactor}vw, 8rem)`,
+        height: `clamp(4rem, ${10 * scaleFactor}vw, 8rem)`,
+        border: `${0.5 * scaleFactor}vmin solid ${colors.accent}`,
         borderRadius: "50%",
         left: "50%",
-        top: "80%",
+        top: "65%",
         transform: "translate(-50%, -50%)",
+        opacity: "0",
+        boxShadow: "0 0 30px rgba(255, 64, 129, 0.7)",
+      },
+      container
+    );
+
+    const manFigure = createElement(
+      "div",
+      {
+        position: "absolute",
+        width: `clamp(14rem, ${40 * scaleFactor}vw, 30rem)`,
+        height: `clamp(21rem, ${60 * scaleFactor}vw, 45rem)`,
+        left: "50%",
+        top: "55%",
+        transform: "translate(-50%, -50%)",
+        cursor: "crosshair",
+        backgroundImage:
+          "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/man-silhouette-UMzygGQMtWa3QaRQwSxP8OfADH4DOp.png')",
+        backgroundSize: "contain",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
         opacity: "0",
       },
       container
     );
 
-    let isMouseDown = false;
-    let shootingInterval: NodeJS.Timeout | null = null;
-
-    const createShootingEffect = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const hole = createElement(
-        "div",
-        {
-          position: "absolute",
-          width: "10px",
-          height: "10px",
-          borderRadius: "50%",
-          backgroundColor: "#ff0000",
-          left: `${x}px`,
-          top: `${y}px`,
-          transform: "translate(-50%, -50%)",
-          zIndex: "10",
-        },
-        container
-      );
-
-      gsap.to(hole, {
-        scale: 3,
-        opacity: 0.7,
-        duration: 0.3,
-      });
-
-      const createBloodDrop = () => {
-        const blood = createElement(
-          "div",
-          {
-            position: "absolute",
-            width: "3px",
-            height: "3px",
-            borderRadius: "50%",
-            backgroundColor: "#ff0000",
-            left: `${x}px`,
-            top: `${y}px`,
-            transform: "translate(-50%, -50%)",
-            zIndex: "11",
-          },
-          container
-        );
-
-        gsap.to(blood, {
-          y: containerHeight - y,
-          opacity: 0,
-          duration: 2,
-          ease: "power1.in",
-          onComplete: () => {
-            if (container.contains(blood)) {
-              container.removeChild(blood);
-            }
-          },
-        });
-      };
-
-      createBloodDrop();
-      const drippingInterval = setInterval(createBloodDrop, 500);
-      (hole as HTMLElement).dataset.drippingInterval =
-        drippingInterval.toString();
-    };
-
-    const handleMouseDown = (e: MouseEvent) => {
-      isMouseDown = true;
-      createShootingEffect(e);
-      shootingInterval = setInterval(() => {
-        if (isMouseDown) {
-          createShootingEffect(e);
-        }
-      }, 100);
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isMouseDown) {
-        createShootingEffect(e);
-      }
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      setSightPosition({ x, y });
-    };
-
-    const handleMouseUp = () => {
-      isMouseDown = false;
-      if (shootingInterval) {
-        clearInterval(shootingInterval);
-      }
-    };
-
-    container.addEventListener("mousedown", handleMouseDown);
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseup", handleMouseUp);
-    container.addEventListener("mouseleave", handleMouseUp);
-
     const tl = gsap.timeline({ onComplete: () => setAnimationComplete(true) });
 
     tl.to(letterElements, {
       opacity: 1,
-      duration: 0.5,
-      stagger: 0.2,
-      ease: "power2.inOut",
+      duration: 0.7,
+      stagger: 0.3,
+      ease: "power3.inOut",
     }).to(letterElements, {
-      y: `-${2 * scaleFactor}vmin`,
-      duration: 0.5,
-      stagger: 0.2,
-      ease: "power2.inOut",
+      y: `-=${4 * scaleFactor}vmin`,
+      duration: 0.7,
+      stagger: 0.3,
+      ease: "power3.inOut",
     });
 
     tl.to(
       wordElements,
       {
         opacity: 1,
-        duration: 0.5,
-        stagger: 0.2,
-        ease: "power2.inOut",
+        duration: 0.7,
+        stagger: 0.3,
+        ease: "power3.inOut",
       },
-      "-=0.5"
+      "-=0.7"
     );
 
     tl.to(iconEl, {
       opacity: 1,
-      duration: 0.5,
-      ease: "power2.inOut",
+      duration: 0.7,
+      ease: "power3.inOut",
     });
 
     tl.to(
       lineElements[0],
       {
         opacity: 1,
-        width: "70%",
-        left: "15%",
-        top: "80%",
-        height: "2px",
-        duration: 0.5,
-        ease: "power2.inOut",
+        width: "75%",
+        left: "12.5%",
+        top: "65%",
+        height: "3px",
+        duration: 0.7,
+        ease: "power3.inOut",
       },
-      "-=0.5"
+      "-=0.7"
     ).to(
       lineElements[1],
       {
         opacity: 1,
-        height: "55%",
+        height: "40%",
         left: "50%",
-        top: "42.5%",
-        width: "2px",
-        duration: 0.5,
-        ease: "power2.inOut",
+        top: "45%",
+        width: "3px",
+        duration: 0.7,
+        ease: "power3.inOut",
       },
-      "-=0.3"
+      "-=0.5"
     );
 
     tl.to(
       circleEl,
       {
         opacity: 1,
-        scale: 1.2,
-        duration: 0.5,
-        ease: "power2.inOut",
+        scale: 1.3,
+        duration: 0.7,
+        ease: "power3.inOut",
       },
-      "-=0.3"
+      "-=0.5"
     );
 
-    tl.to({}, { duration: 2 });
+    tl.to(manFigure, {
+      opacity: 1,
+      duration: 0.7,
+      ease: "power3.inOut",
+    });
+
+    gsap.to(manFigure, {
+      y: "-=30px",
+      duration: 2.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut",
+    });
+
+    gsap.to(circleEl, {
+      scale: 1.2,
+      duration: 1.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut",
+    });
 
     return () => {
       tl.kill();
-      container.removeEventListener("mousedown", handleMouseDown);
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseup", handleMouseUp);
-      container.removeEventListener("mouseleave", handleMouseUp);
-      container.querySelectorAll("[data-dripping-interval]").forEach((hole) => {
-        clearInterval(
-          parseInt((hole as HTMLElement).dataset.drippingInterval || "0", 10)
-        );
-      });
-      if (shootingInterval) {
-        clearInterval(shootingInterval);
+    };
+  }, [colors, createElement]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (spotlightRef.current) {
+          spotlightRef.current.style.background = `
+            radial-gradient(
+              circle at ${x}px ${y}px,
+              rgba(255, 255, 255,${isDrawerOpen ? "0.05" : "0.15"}) 0%,
+              rgba(255, 255, 255,${isDrawerOpen ? "0.03" : "0.08"}) 25%,
+              rgba(255, 255, 255, 0) 60%
+            )
+          `;
+        }
+
+        setSightPosition({ x, y });
+
+        if (isMouseDown) {
+          createShootingEffect(e);
+        }
       }
     };
-  }, []);
+
+    if (animationComplete) {
+      window.addEventListener("mousemove", handleMouseMove);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [animationComplete, isDrawerOpen, isMouseDown, createShootingEffect]);
+
+  const toggleDrawer = useCallback(() => {
+    setIsDrawerOpen(!isDrawerOpen);
+  }, [isDrawerOpen]);
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
+  const GunIndicator: React.FC<{ gunType: number }> = ({ gunType }) => (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" opacity={gunType >= 1 ? "1" : "0.2"} />
+      <circle cx="12" cy="12" r="3" opacity={gunType >= 2 ? "1" : "0.2"} />
+      <circle cx="12" cy="12" r="1" opacity={gunType === 3 ? "1" : "0.2"} />
+    </svg>
+  );
 
   return (
-    <div
-      className={`${montserrat.variable} font-sans min-h-screen bg-gray-900 text-white select-none`}
-    >
+    <div className="font-goldeneye min-h-screen bg-[#1e1e1e] text-[#d4d4d4] select-none overflow-hidden cursor-none">
+      <div className="absolute inset-0 backdrop-blur-sm z-10" />
       <div
         ref={containerRef}
-        className="relative w-full h-screen overflow-hidden cursor-none"
+        className={`relative w-full h-screen overflow-hidden cursor-crosshair z-20 transition-all duration-300 ${
+          isDrawerOpen ? "blur-sm" : ""
+        }`}
         aria-label="Interactive animation for Metrosexual Awareness Night (M.A.N.)"
+        onMouseDown={() => setIsMouseDown(true)}
+        onMouseUp={() => setIsMouseDown(false)}
+        onMouseLeave={() => setIsMouseDown(false)}
       >
-        {!animationComplete && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-pink-500"></div>
-          </div>
-        )}
-        {animationComplete && (
+        <Image
+          src="/pinstripe2.jpeg"
+          alt="Background"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          className="opacity-50"
+        />
+        <div className="relative z-10 w-full h-full">
+          {animationComplete && (
+            <div
+              ref={spotlightRef}
+              className="absolute inset-0 pointer-events-none z-40"
+            />
+          )}
+          {animationComplete && (
+            <div
+              className="sight absolute pointer-events-none z-60"
+              style={{
+                left: `${sightPosition.x}px`,
+                top: `${sightPosition.y}px`,
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              <div className="w-24 h-24 border-2 border-[#00ff00] rounded-full opacity-60"></div>
+              <div className="w-20 h-20 border-2 border-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+              <div className="w-3 h-3 bg-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+              <div
+                className="absolute left-1/2 top-0 w-0.5 h-full bg-[#00ff00] opacity-60"
+                style={{ transform: "translateX(-50%)" }}
+              ></div>
+              <div
+                className="absolute left-0 top-1/2 w-full h-0.5 bg-[#00ff00] opacity-60"
+                style={{ transform: "translateY(-50%)" }}
+              ></div>
+            </div>
+          )}
           <div
-            className="sight absolute pointer-events-none"
+            ref={manFigureRef}
+            className="absolute w-[clamp(12rem,35vw,25rem)] h-[clamp(18rem,50vw,35rem)] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-contain bg-no-repeat bg-center z-30"
             style={{
-              left: `${sightPosition.x}px`,
-              top: `${sightPosition.y}px`,
-              transform: "translate(-50%, -50%)",
+              backgroundImage:
+                "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/man-silhouette-UMzygGQMtWa3QaRQwSxP8OfADH4DOp.png')",
             }}
-          >
-            <div className="w-8 h-8 border-2 border-red-500 rounded-full"></div>
-            <div
-              className="absolute left-1/2 top-1/2 w-1 h-8 bg-red-500"
-              style={{ transform: "translate(-50%, -50%)" }}
-            ></div>
-            <div
-              className="absolute left-1/2 top-1/2 w-8 h-1 bg-red-500"
-              style={{ transform: "translate(-50%, -50%)" }}
-            ></div>
-          </div>
-        )}
+          />
+        </div>
       </div>
 
       {animationComplete && (
-        <section className="bg-black py-24 px-6 select-none">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl mb-16 text-gray-300 border-b border-gray-700 pb-4">
-              EVENT DETAILS
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-              <div className="bg-gray-900 p-8 border border-gray-800 rounded-lg shadow-lg">
-                <h3 className="text-xl mb-6 text-gray-400 border-b border-gray-700 pb-2">
-                  THE ESSENTIALS
-                </h3>
-                <ul className="space-y-6 text-sm">
-                  {[
-                    ["DATE", "SEP 15, 2024"],
-                    ["TIME", "20:00-02:00"],
-                    ["VENUE", "WHAMMY BAR"],
-                    ["COST", "$15.00"],
-                    ["DRESS", "METROSEXUAL"],
-                  ].map(([label, value]) => (
-                    <li
-                      key={label}
-                      className="flex justify-between items-center"
-                    >
-                      <span className="text-gray-500">{label}</span>
-                      <span className="text-gray-300">{value}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="bg-gray-900 p-8 border border-gray-800 rounded-lg shadow-lg">
-                <h3 className="text-xl mb-6 text-gray-400 border-b border-gray-700 pb-2">
-                  ABOUT THE HOSTS
-                </h3>
-                <p className="mb-6 text-gray-300 text-sm">
-                  JOIN US FOR A NIGHT CURATED BY:
-                </p>
-                <ul className="space-y-6 text-sm">
-                  {[
-                    ["THOM HAHA", "GROOMING GURU"],
-                    ["MAX YOUNG", "LOCAL MUSICIAN"],
-                  ].map(([name, title]) => (
-                    <li
-                      key={name}
-                      className="flex justify-between items-center"
-                    >
-                      <span className="text-gray-500">{name}</span>
-                      <span className="text-gray-300">{title}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="mt-16 text-center">
-              <button
-                className="bg-gray-800 text-gray-300 py-4 px-8 text-sm hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 border border-gray-700 rounded-full"
-                aria-label="Purchase tickets for the event"
-              >
-                GET YOUR TICKETS NOW
-              </button>
-            </div>
+        <>
+          <div className="fixed bottom-4 left-4 flex space-x-4 z-50">
+            <motion.button
+              onClick={toggleMute}
+              className="bg-[#F7CAC9] text-[#555555] p-3 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+            </motion.button>
+            <motion.button
+              onClick={changeGun}
+              className="bg-[#F7CAC9] text-[#555555] p-3 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <GunIndicator gunType={currentGun} />
+            </motion.button>
+            <motion.button
+              onClick={toggleDrawer}
+              className="bg-[#F7CAC9] text-[#555555] px-4 py-2 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300 flex items-center space-x-2"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Info size={20} />
+              <span className="font-authentic text-sm hidden sm:inline">
+                EVENT DETAILS
+              </span>
+            </motion.button>
           </div>
-        </section>
+          <AnimatePresence>
+            {isDrawerOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                onClick={toggleDrawer}
+              >
+                <motion.div
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                  className="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-[#F7F7F7] text-[#555555] overflow-y-auto z-50 cursor-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="p-6 font-authentic">
+                    <div className="flex justify-between items-center mb-8">
+                      <h2 className="text-2xl font-bold text-[#555555]">
+                        Event Details
+                      </h2>
+                      <button
+                        onClick={toggleDrawer}
+                        className="text-[#555555] hover:text-[#F5B7B1]"
+                        aria-label="Close event information"
+                      >
+                        <X size={24} />
+                      </button>
+                    </div>
+                    <div className="space-y-6">
+                      <DetailItem
+                        icon={<Calendar size={20} />}
+                        label="Date"
+                        value="SEP 15, 2024"
+                      />
+                      <DetailItem
+                        icon={<Clock size={20} />}
+                        label="Time"
+                        value="20:00-02:00"
+                      />
+                      <DetailItem
+                        icon={<MapPin size={20} />}
+                        label="Venue"
+                        value="WHAMMY BAR"
+                      />
+                      <DetailItem
+                        icon={<DollarSign size={20} />}
+                        label="Entry Fee"
+                        value="$100.00"
+                      />
+                      <DetailItem
+                        icon={<DollarSign size={20} />}
+                        label="Metrosexual Concession"
+                        value="$15.00"
+                      />
+                      <DetailItem
+                        icon={<Shirt size={20} />}
+                        label="Attire"
+                        value="METROSEXUAL"
+                      />
+                      <DetailItem
+                        icon={<Users size={20} />}
+                        label="Hosts"
+                        value="THOM HAHA & MAXWELL YOUNG"
+                      />
+                    </div>
+                    <motion.a
+                      href="#"
+                      className="mt-8 w-full bg-[#F5B7B1] text-[#555555] py-3 px-6 rounded-lg text-center font-bold tracking-wider flex items-center justify-center space-x-2"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Ticket size={20} />
+                      <span>BUY TICKETS</span>
+                    </motion.a>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
       )}
 
+      {guns.map((gun, index) => (
+        <audio
+          key={index}
+          ref={(el) => {
+            if (el) audioRefs.current[index] = el;
+          }}
+          src={gun.sound}
+        />
+      ))}
+
       <style jsx global>{`
-        * {
-          user-select: none;
+        @font-face {
+          font-family: "GoldenEye";
+          src: url("/fonts/GoldenEye.ttf") format("truetype");
+          font-weight: normal;
+          font-style: normal;
         }
+
+        @font-face {
+          font-family: "Authentic Sans";
+          src: url("/fonts/Authentic-Sans.otf") format("opentype");
+          font-weight: normal;
+          font-style: normal;
+        }
+
+        body {
+          font-family: "GoldenEye", sans-serif;
+        }
+
+        .font-authentic {
+          font-family: "Authentic Sans", sans-serif;
+        }
+
+        .cursor-crosshair {
+          cursor: crosshair;
+        }
+
         .cursor-none {
           cursor: none;
         }
       `}</style>
+    </div>
+  );
+}
+
+function DetailItem({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center space-x-4 bg-[#E6E6E6] bg-opacity-50 p-4 rounded-lg">
+      <div className="text-[#F5B7B1]">{icon}</div>
+      <div>
+        <span className="text-[#888888] text-sm">{label}</span>
+        <span className="text-[#555555] font-semibold block">{value}</span>
+      </div>
     </div>
   );
 }
