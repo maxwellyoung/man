@@ -49,7 +49,7 @@ export default function MotionDesignMANAnimation() {
       background: "#1a1a1a",
       primary: "#e0e0e0",
       secondary: "#b0b0b0",
-      accent: "#ff4081",
+      accent: "#ff4081", // Reverted back to the original accent color
     }),
     []
   );
@@ -312,7 +312,6 @@ export default function MotionDesignMANAnimation() {
     );
 
     const manLetters = ["M", "A", "N"];
-    const words = ["METROSEXUAL", "AWARENESS", "NIGHT"];
     const letterElements = manLetters.map((letter, index) =>
       createElement(
         "div",
@@ -322,8 +321,8 @@ export default function MotionDesignMANAnimation() {
           fontWeight: "700",
           color: colors.primary,
           opacity: "0",
-          left: `${isMobile ? 50 : 25 + 25 * index}%`,
-          top: isMobile ? `${15 + 10 * index}%` : "15%",
+          left: `${25 + 25 * index}%`,
+          top: isMobile ? "10%" : "15%", // Adjusted for mobile
           transform: "translate(-50%, -50%)",
           fontFamily: "GoldenEye, sans-serif",
           padding: `${1 * scaleFactor}vmin`,
@@ -335,6 +334,7 @@ export default function MotionDesignMANAnimation() {
       )
     );
 
+    const words = ["METROSEXUAL", "AWARENESS", "NIGHT"];
     const wordElements = words.map((word, index) =>
       createElement(
         "div",
@@ -345,7 +345,7 @@ export default function MotionDesignMANAnimation() {
           color: colors.secondary,
           opacity: "0",
           left: "50%",
-          top: isMobile ? `${35 + 8 * index}%` : `${25 + 5 * index}%`,
+          top: isMobile ? `${25 + 8 * index}%` : `${25 + 5 * index}%`, // Adjusted for mobile
           transform: "translate(-50%, -50%)",
           fontFamily: "GoldenEye, sans-serif",
           textAlign: "center",
@@ -750,7 +750,7 @@ export default function MotionDesignMANAnimation() {
                     </div>
                     <motion.a
                       href="#"
-                      className="mt-6 sm:mt-8 w-full bg-[#F5B7B1] text-[#555555] py-2 sm:py-3 px-4 sm:px-6 rounded-lg text-center font-bold tracking-wider flex items-center justify-center space-x-2"
+                      className="mt-6 sm:mt-8 w-full bg-[#F5B7B1] text-[#1a1a1a] py-2 sm:py-3 px-4 sm:px-6 rounded-lg text-center font-bold tracking-wider flex items-center justify-center space-x-2"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -804,6 +804,16 @@ export default function MotionDesignMANAnimation() {
 
         .cursor-none {
           cursor: none;
+        }
+
+        .sight div {
+          border-color: #00ff00;
+        }
+
+        .sight div:nth-child(3),
+        .sight div:nth-child(4),
+        .sight div:nth-child(5) {
+          background-color: #00ff00;
         }
       `}</style>
     </div>
