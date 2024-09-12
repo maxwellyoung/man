@@ -296,7 +296,7 @@ export default function MotionDesignMANAnimation() {
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     const scaleFactor = Math.min(containerWidth / 1000, containerHeight / 800);
-    const isMobile = containerWidth < 768; // Define mobile breakpoint
+    const isMobile = containerWidth < 768;
 
     const bgEl = createElement(
       "div",
@@ -318,12 +318,12 @@ export default function MotionDesignMANAnimation() {
         "div",
         {
           position: "absolute",
-          fontSize: `clamp(4rem, ${12 * scaleFactor}vw, 12rem)`,
+          fontSize: `clamp(3rem, ${10 * scaleFactor}vw, 12rem)`,
           fontWeight: "700",
           color: colors.primary,
           opacity: "0",
-          left: `${25 + 25 * index}%`,
-          top: "15%",
+          left: `${isMobile ? 50 : 25 + 25 * index}%`,
+          top: isMobile ? `${15 + 10 * index}%` : "15%",
           transform: "translate(-50%, -50%)",
           fontFamily: "GoldenEye, sans-serif",
           padding: `${1 * scaleFactor}vmin`,
@@ -340,16 +340,16 @@ export default function MotionDesignMANAnimation() {
         "div",
         {
           position: "absolute",
-          fontSize: `clamp(1.5rem, ${3 * scaleFactor}vw, 3rem)`,
+          fontSize: `clamp(1rem, ${2.5 * scaleFactor}vw, 3rem)`,
           fontWeight: "500",
           color: colors.secondary,
           opacity: "0",
-          left: `${25 + 25 * index}%`,
-          top: "30%",
+          left: "50%",
+          top: isMobile ? `${35 + 8 * index}%` : `${25 + 5 * index}%`,
           transform: "translate(-50%, -50%)",
           fontFamily: "GoldenEye, sans-serif",
           textAlign: "center",
-          width: "30%",
+          width: isMobile ? "90%" : "30%",
           userSelect: "none",
           textShadow: "0 0 10px rgba(176, 176, 176, 0.5)",
         },
@@ -647,7 +647,7 @@ export default function MotionDesignMANAnimation() {
 
       {animationComplete && (
         <>
-          <div className="fixed bottom-4 left-4 flex space-x-2 sm:space-x-4 z-50">
+          <div className="fixed bottom-4 left-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 z-50">
             <motion.button
               onClick={toggleMute}
               className="bg-[#F7CAC9] text-[#555555] p-2 sm:p-3 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300"
@@ -666,12 +666,12 @@ export default function MotionDesignMANAnimation() {
             </motion.button>
             <motion.button
               onClick={toggleDrawer}
-              className="bg-[#F7CAC9] text-[#555555] px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300 flex items-center space-x-1 sm:space-x-2"
+              className="bg-[#F7CAC9] text-[#555555] px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300 flex items-center justify-center space-x-1 sm:space-x-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Info size={18} />
-              <span className="font-authentic text-xs sm:text-sm hidden sm:inline">
+              <span className="font-authentic text-xs sm:text-sm">
                 EVENT DETAILS
               </span>
             </motion.button>
