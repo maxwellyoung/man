@@ -23,6 +23,7 @@ import {
   Users,
   Ticket,
   Target,
+  Music,
 } from "lucide-react";
 import * as THREE from "three";
 
@@ -295,6 +296,7 @@ export default function MotionDesignMANAnimation() {
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     const scaleFactor = Math.min(containerWidth / 1000, containerHeight / 800);
+    const isMobile = containerWidth < 768; // Define mobile breakpoint
 
     const bgEl = createElement(
       "div",
@@ -592,6 +594,8 @@ export default function MotionDesignMANAnimation() {
         onMouseDown={() => setIsMouseDown(true)}
         onMouseUp={() => setIsMouseDown(false)}
         onMouseLeave={() => setIsMouseDown(false)}
+        onTouchStart={() => setIsMouseDown(true)}
+        onTouchEnd={() => setIsMouseDown(false)}
       >
         <Image
           src="/pinstripe2.jpeg"
@@ -617,9 +621,9 @@ export default function MotionDesignMANAnimation() {
                 transform: "translate(-50%, -50%)",
               }}
             >
-              <div className="w-24 h-24 border-2 border-[#00ff00] rounded-full opacity-60"></div>
-              <div className="w-20 h-20 border-2 border-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="w-3 h-3 bg-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+              <div className="w-16 h-16 sm:w-24 sm:h-24 border-2 border-[#00ff00] rounded-full opacity-60"></div>
+              <div className="w-12 h-12 sm:w-20 sm:h-20 border-2 border-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+              <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
               <div
                 className="absolute left-1/2 top-0 w-0.5 h-full bg-[#00ff00] opacity-60"
                 style={{ transform: "translateX(-50%)" }}
@@ -632,7 +636,7 @@ export default function MotionDesignMANAnimation() {
           )}
           <div
             ref={manFigureRef}
-            className="absolute w-[clamp(12rem,35vw,25rem)] h-[clamp(18rem,50vw,35rem)] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-contain bg-no-repeat bg-center z-30"
+            className="absolute w-[clamp(10rem,30vw,25rem)] h-[clamp(15rem,45vw,35rem)] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-contain bg-no-repeat bg-center z-30"
             style={{
               backgroundImage:
                 "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/man-silhouette-UMzygGQMtWa3QaRQwSxP8OfADH4DOp.png')",
@@ -643,18 +647,18 @@ export default function MotionDesignMANAnimation() {
 
       {animationComplete && (
         <>
-          <div className="fixed bottom-4 left-4 flex space-x-4 z-50">
+          <div className="fixed bottom-4 left-4 flex space-x-2 sm:space-x-4 z-50">
             <motion.button
               onClick={toggleMute}
-              className="bg-[#F7CAC9] text-[#555555] p-3 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300"
+              className="bg-[#F7CAC9] text-[#555555] p-2 sm:p-3 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+              {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
             </motion.button>
             <motion.button
               onClick={changeGun}
-              className="bg-[#F7CAC9] text-[#555555] p-3 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300"
+              className="bg-[#F7CAC9] text-[#555555] p-2 sm:p-3 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
@@ -662,12 +666,12 @@ export default function MotionDesignMANAnimation() {
             </motion.button>
             <motion.button
               onClick={toggleDrawer}
-              className="bg-[#F7CAC9] text-[#555555] px-4 py-2 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300 flex items-center space-x-2"
+              className="bg-[#F7CAC9] text-[#555555] px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300 flex items-center space-x-1 sm:space-x-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Info size={20} />
-              <span className="font-authentic text-sm hidden sm:inline">
+              <Info size={18} />
+              <span className="font-authentic text-xs sm:text-sm hidden sm:inline">
                 EVENT DETAILS
               </span>
             </motion.button>
@@ -686,12 +690,12 @@ export default function MotionDesignMANAnimation() {
                   animate={{ x: 0 }}
                   exit={{ x: "100%" }}
                   transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                  className="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-[#F7F7F7] text-[#555555] overflow-y-auto z-50 cursor-auto"
+                  className="fixed right-0 top-0 bottom-0 w-full max-w-[90%] sm:max-w-[400px] bg-[#F7F7F7] text-[#555555] overflow-y-auto z-50 cursor-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="p-6 font-authentic">
-                    <div className="flex justify-between items-center mb-8">
-                      <h2 className="text-2xl font-bold text-[#555555]">
+                  <div className="p-4 sm:p-6 font-authentic">
+                    <div className="flex justify-between items-center mb-6 sm:mb-8">
+                      <h2 className="text-xl sm:text-2xl font-bold text-[#555555]">
                         Event Details
                       </h2>
                       <button
@@ -702,50 +706,55 @@ export default function MotionDesignMANAnimation() {
                         <X size={24} />
                       </button>
                     </div>
-                    <div className="space-y-6">
+                    <div className="space-y-3 sm:space-y-4">
                       <DetailItem
-                        icon={<Calendar size={20} />}
+                        icon={<Calendar size={18} />}
                         label="Date"
                         value="SEP 15, 2024"
                       />
                       <DetailItem
-                        icon={<Clock size={20} />}
+                        icon={<Clock size={18} />}
                         label="Time"
                         value="20:00-02:00"
                       />
                       <DetailItem
-                        icon={<MapPin size={20} />}
+                        icon={<MapPin size={18} />}
                         label="Venue"
                         value="WHAMMY BAR"
                       />
                       <DetailItem
-                        icon={<DollarSign size={20} />}
+                        icon={<DollarSign size={18} />}
                         label="Entry Fee"
                         value="$100.00"
                       />
                       <DetailItem
-                        icon={<DollarSign size={20} />}
+                        icon={<DollarSign size={18} />}
                         label="Metrosexual Concession"
                         value="$15.00"
                       />
                       <DetailItem
-                        icon={<Shirt size={20} />}
+                        icon={<Shirt size={18} />}
                         label="Attire"
                         value="METROSEXUAL"
                       />
                       <DetailItem
-                        icon={<Users size={20} />}
+                        icon={<Users size={18} />}
                         label="Hosts"
                         value="THOM HAHA & MAXWELL YOUNG"
+                      />
+                      <DetailItem
+                        icon={<Music size={18} />}
+                        label="DJs"
+                        value="HOST B2B, USER 69, DJ CONTRARION, DJ SENORITA"
                       />
                     </div>
                     <motion.a
                       href="#"
-                      className="mt-8 w-full bg-[#F5B7B1] text-[#555555] py-3 px-6 rounded-lg text-center font-bold tracking-wider flex items-center justify-center space-x-2"
+                      className="mt-6 sm:mt-8 w-full bg-[#F5B7B1] text-[#555555] py-2 sm:py-3 px-4 sm:px-6 rounded-lg text-center font-bold tracking-wider flex items-center justify-center space-x-2"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <Ticket size={20} />
+                      <Ticket size={18} />
                       <span>BUY TICKETS</span>
                     </motion.a>
                   </div>
@@ -776,7 +785,7 @@ export default function MotionDesignMANAnimation() {
 
         @font-face {
           font-family: "Authentic Sans";
-          src: url("/fonts/Authentic-Sans.otf") format("opentype");
+          src: url("/fonts/authentic-sans-60.otf") format("opentype");
           font-weight: normal;
           font-style: normal;
         }
@@ -811,11 +820,11 @@ function DetailItem({
   value: string;
 }) {
   return (
-    <div className="flex items-center space-x-4 bg-[#E6E6E6] bg-opacity-50 p-4 rounded-lg">
-      <div className="text-[#F5B7B1]">{icon}</div>
-      <div>
-        <span className="text-[#888888] text-sm">{label}</span>
-        <span className="text-[#555555] font-semibold block">{value}</span>
+    <div className="flex items-center space-x-2 sm:space-x-4 bg-[#E6E6E6] bg-opacity-50 p-2 sm:p-4 rounded-lg">
+      <div className="text-[#F5B7B1] flex-shrink-0">{icon}</div>
+      <div className="flex-grow">
+        <p className="text-xs sm:text-sm font-semibold">{label}</p>
+        <p className="text-sm sm:text-base">{value}</p>
       </div>
     </div>
   );
