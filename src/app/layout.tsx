@@ -1,42 +1,32 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Metrosexual Awareness Night",
-  description: "by Thom Haha & Maxwell Young",
-  keywords: ["metrosexual", "awareness", "event", "Thom Haha", "Maxwell Young"],
-  authors: [{ name: "Thom Haha" }, { name: "Maxwell Young" }],
+  description: "Join us for a night of metrosexual awareness and celebration",
   openGraph: {
     title: "Metrosexual Awareness Night",
     description: "Join us for a night of metrosexual awareness and celebration",
-    url: "https://metrosexual-awareness-night.com",
-    siteName: "Metrosexual Awareness Night",
     images: [
       {
-        url: "https://metrosexual-awareness-night.com/og-image.jpg",
+        url: "https://your-website.com/og-image.jpg", // Replace with your actual image URL
         width: 1200,
         height: 630,
+        alt: "Metrosexual Awareness Night Preview",
       },
     ],
-    locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Metrosexual Awareness Night",
     description: "Join us for a night of metrosexual awareness and celebration",
-    images: ["https://metrosexual-awareness-night.com/twitter-image.jpg"],
+    images: ["https://your-website.com/twitter-image.jpg"], // Replace with your actual image URL
   },
-  icons: [
-    {
-      rel: "icon",
-      url: "/favicon.svg",
-      type: "image/svg+xml",
-    },
-  ],
 };
 
 export default function RootLayout({
@@ -46,7 +36,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <Script id="google-tag-manager" strategy="afterInteractive">
+          {`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-WC9WXF7S');
+          `}
+        </Script>
+      </head>
+      <body className={inter.className}>
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-WC9WXF7S"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+        {children}
+      </body>
     </html>
   );
 }
