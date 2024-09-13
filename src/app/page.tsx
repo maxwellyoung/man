@@ -43,6 +43,7 @@ export default function MotionDesignMANAnimation() {
   const [currentCockSound, setCurrentCockSound] = useState(0);
   const [lastShootTime, setLastShootTime] = useState(0);
   const [currentGun, setCurrentGun] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const colors = useMemo(
     () => ({
@@ -345,7 +346,7 @@ export default function MotionDesignMANAnimation() {
           color: colors.secondary,
           opacity: "0",
           left: "50%",
-          top: isMobile ? `${25 + 8 * index}%` : `${25 + 5 * index}%`, // Adjusted for mobile
+          top: isMobile ? `${30 + 8 * index}%` : `${25 + 5 * index}%`, // Adjusted for mobile
           transform: "translate(-50%, -50%)",
           fontFamily: "GoldenEye, sans-serif",
           textAlign: "center",
@@ -597,52 +598,64 @@ export default function MotionDesignMANAnimation() {
         onTouchStart={() => setIsMouseDown(true)}
         onTouchEnd={() => setIsMouseDown(false)}
       >
+        {/* Low-quality image placeholder */}
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
+          style={{
+            backgroundImage: "url('/pinstripe2-lqip.jpg')",
+            opacity: imageLoaded ? 0 : 1,
+          }}
+        />
+
         <Image
           src="/pinstripe2.jpeg"
           alt="Background"
           layout="fill"
           objectFit="cover"
-          quality={100}
-          className="opacity-50"
+          quality={85}
+          priority
+          className={`opacity-50 transition-opacity duration-500 ${
+            imageLoaded ? "opacity-50" : "opacity-0"
+          }`}
+          onLoadingComplete={() => setImageLoaded(true)}
         />
-        <div className="relative z-10 w-full h-full">
-          {animationComplete && (
-            <div
-              ref={spotlightRef}
-              className="absolute inset-0 pointer-events-none z-40"
-            />
-          )}
-          {animationComplete && (
-            <div
-              className="sight absolute pointer-events-none z-60"
-              style={{
-                left: `${sightPosition.x}px`,
-                top: `${sightPosition.y}px`,
-                transform: "translate(-50%, -50%)",
-              }}
-            >
-              <div className="w-16 h-16 sm:w-24 sm:h-24 border-2 border-[#00ff00] rounded-full opacity-60"></div>
-              <div className="w-12 h-12 sm:w-20 sm:h-20 border-2 border-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-              <div
-                className="absolute left-1/2 top-0 w-0.5 h-full bg-[#00ff00] opacity-60"
-                style={{ transform: "translateX(-50%)" }}
-              ></div>
-              <div
-                className="absolute left-0 top-1/2 w-full h-0.5 bg-[#00ff00] opacity-60"
-                style={{ transform: "translateY(-50%)" }}
-              ></div>
-            </div>
-          )}
+
+        {animationComplete && (
           <div
-            ref={manFigureRef}
-            className="absolute w-[clamp(10rem,30vw,25rem)] h-[clamp(15rem,45vw,35rem)] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-contain bg-no-repeat bg-center z-30"
-            style={{
-              backgroundImage:
-                "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/man-silhouette-UMzygGQMtWa3QaRQwSxP8OfADH4DOp.png')",
-            }}
+            ref={spotlightRef}
+            className="absolute inset-0 pointer-events-none z-40"
           />
-        </div>
+        )}
+        {animationComplete && (
+          <div
+            className="sight absolute pointer-events-none z-60"
+            style={{
+              left: `${sightPosition.x}px`,
+              top: `${sightPosition.y}px`,
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <div className="w-16 h-16 sm:w-24 sm:h-24 border-2 border-[#FF588F] rounded-full opacity-60"></div>
+            <div className="w-12 h-12 sm:w-20 sm:h-20 border-2 border-[#FF588F] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#FF588F] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+            <div
+              className="absolute left-1/2 top-0 w-0.5 h-full bg-[#FF588F] opacity-60"
+              style={{ transform: "translateX(-50%)" }}
+            ></div>
+            <div
+              className="absolute left-0 top-1/2 w-full h-0.5 bg-[#FF588F] opacity-60"
+              style={{ transform: "translateY(-50%)" }}
+            ></div>
+          </div>
+        )}
+        <div
+          ref={manFigureRef}
+          className="absolute w-[clamp(10rem,30vw,25rem)] h-[clamp(15rem,45vw,35rem)] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-contain bg-no-repeat bg-center z-30"
+          style={{
+            backgroundImage:
+              "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/man-silhouette-UMzygGQMtWa3QaRQwSxP8OfADH4DOp.png')",
+          }}
+        />
       </div>
 
       {animationComplete && (
@@ -650,7 +663,7 @@ export default function MotionDesignMANAnimation() {
           <div className="fixed bottom-4 left-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 z-50">
             <motion.button
               onClick={toggleMute}
-              className="bg-[#F7CAC9] text-[#555555] p-2 sm:p-3 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300"
+              className="bg-[#FF588F] text-[#1a1a1a] p-2 sm:p-3 rounded-full shadow-lg hover:bg-[#FF7AA7] transition-colors duration-300"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
@@ -658,7 +671,7 @@ export default function MotionDesignMANAnimation() {
             </motion.button>
             <motion.button
               onClick={changeGun}
-              className="bg-[#F7CAC9] text-[#555555] p-2 sm:p-3 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300"
+              className="bg-[#FF588F] text-[#1a1a1a] p-2 sm:p-3 rounded-full shadow-lg hover:bg-[#FF7AA7] transition-colors duration-300"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
@@ -666,7 +679,7 @@ export default function MotionDesignMANAnimation() {
             </motion.button>
             <motion.button
               onClick={toggleDrawer}
-              className="bg-[#F7CAC9] text-[#555555] px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg hover:bg-[#F5B7B1] transition-colors duration-300 flex items-center justify-center space-x-1 sm:space-x-2"
+              className="bg-[#FF588F] text-[#1a1a1a] px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg hover:bg-[#FF7AA7] transition-colors duration-300 flex items-center justify-center space-x-1 sm:space-x-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -700,7 +713,7 @@ export default function MotionDesignMANAnimation() {
                       </h2>
                       <button
                         onClick={toggleDrawer}
-                        className="text-[#555555] hover:text-[#F5B7B1]"
+                        className="text-[#555555] hover:text-[#FF7AA7]"
                         aria-label="Close event information"
                       >
                         <X size={24} />
@@ -750,7 +763,7 @@ export default function MotionDesignMANAnimation() {
                     </div>
                     <motion.a
                       href="#"
-                      className="mt-6 sm:mt-8 w-full bg-[#F5B7B1] text-[#1a1a1a] py-2 sm:py-3 px-4 sm:px-6 rounded-lg text-center font-bold tracking-wider flex items-center justify-center space-x-2"
+                      className="mt-6 sm:mt-8 w-full bg-[#FF588F] text-[#1a1a1a] py-2 sm:py-3 px-4 sm:px-6 rounded-lg text-center font-bold tracking-wider flex items-center justify-center space-x-2"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -807,13 +820,13 @@ export default function MotionDesignMANAnimation() {
         }
 
         .sight div {
-          border-color: #00ff00;
+          border-color: #ff588f;
         }
 
         .sight div:nth-child(3),
         .sight div:nth-child(4),
         .sight div:nth-child(5) {
-          background-color: #00ff00;
+          background-color: #ff588f;
         }
       `}</style>
     </div>
@@ -831,7 +844,7 @@ function DetailItem({
 }) {
   return (
     <div className="flex items-center space-x-2 sm:space-x-4 bg-[#E6E6E6] bg-opacity-50 p-2 sm:p-4 rounded-lg">
-      <div className="text-[#F5B7B1] flex-shrink-0">{icon}</div>
+      <div className="text-[#FF588F] flex-shrink-0">{icon}</div>
       <div className="flex-grow">
         <p className="text-xs sm:text-sm font-semibold">{label}</p>
         <p className="text-sm sm:text-base">{value}</p>
