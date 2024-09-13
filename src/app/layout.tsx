@@ -27,6 +27,16 @@ export const metadata: Metadata = {
     description: "Join us for a night of metrosexual awareness and celebration",
     images: ["https://your-website.com/twitter-image.jpg"], // Replace with your actual image URL
   },
+  icons: {
+    icon: [
+      { url: "/favicon.svg" },
+      new URL("/favicon.svg", "https://your-website.com"),
+    ],
+    apple: [
+      { url: "/favicon.svg" },
+      { url: "/favicon.svg", sizes: "180x180", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({
