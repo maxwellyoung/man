@@ -50,7 +50,7 @@ export default function MotionDesignMANAnimation() {
       background: "#1a1a1a",
       primary: "#e0e0e0",
       secondary: "#b0b0b0",
-      accent: "#ff4081", // Reverted back to the original accent color
+      accent: "#FF588F", // Updated pink color
     }),
     []
   );
@@ -323,7 +323,7 @@ export default function MotionDesignMANAnimation() {
           color: colors.primary,
           opacity: "0",
           left: `${25 + 25 * index}%`,
-          top: isMobile ? "10%" : "15%", // Adjusted for mobile
+          top: isMobile ? "10%" : "15%",
           transform: "translate(-50%, -50%)",
           fontFamily: "GoldenEye, sans-serif",
           padding: `${1 * scaleFactor}vmin`,
@@ -346,7 +346,7 @@ export default function MotionDesignMANAnimation() {
           color: colors.secondary,
           opacity: "0",
           left: "50%",
-          top: isMobile ? `${30 + 8 * index}%` : `${25 + 5 * index}%`, // Adjusted for mobile
+          top: isMobile ? `${30 + 8 * index}%` : `${25 + 5 * index}%`,
           transform: "translate(-50%, -50%)",
           fontFamily: "GoldenEye, sans-serif",
           textAlign: "center",
@@ -598,69 +598,57 @@ export default function MotionDesignMANAnimation() {
         onTouchStart={() => setIsMouseDown(true)}
         onTouchEnd={() => setIsMouseDown(false)}
       >
-        {/* Low-quality image placeholder */}
-        <div
-          className="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
-          style={{
-            backgroundImage: "url('/pinstripe2-lqip.jpg')",
-            opacity: imageLoaded ? 0 : 1,
-          }}
-        />
-
         <Image
           src="/pinstripe2.jpeg"
           alt="Background"
           layout="fill"
           objectFit="cover"
-          quality={85}
-          priority
-          className={`opacity-50 transition-opacity duration-500 ${
-            imageLoaded ? "opacity-50" : "opacity-0"
-          }`}
-          onLoadingComplete={() => setImageLoaded(true)}
+          quality={100}
+          className="opacity-50"
         />
-
-        {animationComplete && (
+        <div className="relative z-10 w-full h-full">
+          {animationComplete && (
+            <div
+              ref={spotlightRef}
+              className="absolute inset-0 pointer-events-none z-40"
+            />
+          )}
+          {animationComplete && (
+            <div
+              className="sight absolute pointer-events-none z-60"
+              style={{
+                left: `${sightPosition.x}px`,
+                top: `${sightPosition.y}px`,
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              <div className="w-16 h-16 sm:w-24 sm:h-24 border-2 border-[#00ff00] rounded-full opacity-60"></div>
+              <div className="w-12 h-12 sm:w-20 sm:h-20 border-2 border-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+              <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#00ff00] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+              <div
+                className="absolute left-1/2 top-0 w-0.5 h-full bg-[#00ff00] opacity-60"
+                style={{ transform: "translateX(-50%)" }}
+              ></div>
+              <div
+                className="absolute left-0 top-1/2 w-full h-0.5 bg-[#00ff00] opacity-60"
+                style={{ transform: "translateY(-50%)" }}
+              ></div>
+            </div>
+          )}
           <div
-            ref={spotlightRef}
-            className="absolute inset-0 pointer-events-none z-40"
-          />
-        )}
-        {animationComplete && (
-          <div
-            className="sight absolute pointer-events-none z-60"
+            ref={manFigureRef}
+            className="absolute w-[clamp(10rem,30vw,25rem)] h-[clamp(15rem,45vw,35rem)] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-contain bg-no-repeat bg-center z-30"
             style={{
-              left: `${sightPosition.x}px`,
-              top: `${sightPosition.y}px`,
-              transform: "translate(-50%, -50%)",
+              backgroundImage:
+                "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/man-silhouette-UMzygGQMtWa3QaRQwSxP8OfADH4DOp.png')",
             }}
-          >
-            <div className="w-16 h-16 sm:w-24 sm:h-24 border-2 border-[#FF588F] rounded-full opacity-60"></div>
-            <div className="w-12 h-12 sm:w-20 sm:h-20 border-2 border-[#FF588F] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#FF588F] rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-            <div
-              className="absolute left-1/2 top-0 w-0.5 h-full bg-[#FF588F] opacity-60"
-              style={{ transform: "translateX(-50%)" }}
-            ></div>
-            <div
-              className="absolute left-0 top-1/2 w-full h-0.5 bg-[#FF588F] opacity-60"
-              style={{ transform: "translateY(-50%)" }}
-            ></div>
-          </div>
-        )}
-        <div
-          ref={manFigureRef}
-          className="absolute w-[clamp(10rem,30vw,25rem)] h-[clamp(15rem,45vw,35rem)] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-contain bg-no-repeat bg-center z-30"
-          style={{
-            backgroundImage:
-              "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/man-silhouette-UMzygGQMtWa3QaRQwSxP8OfADH4DOp.png')",
-          }}
-        />
+          />
+        </div>
       </div>
 
       {animationComplete && (
         <>
-          <div className="fixed bottom-4 left-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 z-50">
+          <div className="fixed bottom-4 left-4 flex space-x-2 sm:space-x-4 z-50">
             <motion.button
               onClick={toggleMute}
               className="bg-[#FF588F] text-[#1a1a1a] p-2 sm:p-3 rounded-full shadow-lg hover:bg-[#FF7AA7] transition-colors duration-300"
@@ -679,12 +667,12 @@ export default function MotionDesignMANAnimation() {
             </motion.button>
             <motion.button
               onClick={toggleDrawer}
-              className="bg-[#FF588F] text-[#1a1a1a] px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg hover:bg-[#FF7AA7] transition-colors duration-300 flex items-center justify-center space-x-1 sm:space-x-2"
+              className="bg-[#FF588F] text-[#1a1a1a] px-3 py-2 sm:px-4 sm:py-2 rounded-full shadow-lg hover:bg-[#FF7AA7] transition-colors duration-300 flex items-center space-x-1 sm:space-x-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Info size={18} />
-              <span className="font-authentic text-xs sm:text-sm">
+              <span className="font-authentic text-xs sm:text-sm hidden sm:inline">
                 EVENT DETAILS
               </span>
             </motion.button>
@@ -820,13 +808,13 @@ export default function MotionDesignMANAnimation() {
         }
 
         .sight div {
-          border-color: #ff588f;
+          border-color: #00ff00;
         }
 
         .sight div:nth-child(3),
         .sight div:nth-child(4),
         .sight div:nth-child(5) {
-          background-color: #ff588f;
+          background-color: #00ff00;
         }
       `}</style>
     </div>
