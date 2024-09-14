@@ -605,6 +605,7 @@ export default function MotionDesignMANAnimation() {
           objectFit="cover"
           quality={100}
           className="opacity-50"
+          priority
         />
         <div className="relative z-10 w-full h-full">
           {animationComplete && (
