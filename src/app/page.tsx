@@ -746,11 +746,11 @@ export default function MotionDesignMANAnimation() {
                       <DetailItem
                         icon={<Music size={18} />}
                         label="DJs"
-                        value="HOST B2B, USER 69, DJ CONTRARION, DJ SENORITA"
+                        value="HOST B2B, USER 69, DJ CONTRARION, DJ SEÑORITA"
                       />
                     </div>
                     <motion.a
-                      href="#"
+                      href="https://www.undertheradar.co.nz/gig/92332/Metrosexual-Awareness-Night.utr"
                       className="mt-6 sm:mt-8 w-full bg-[#FF588F] text-[#1a1a1a] py-2 sm:py-3 px-4 sm:px-6 rounded-lg text-center font-bold tracking-wider flex items-center justify-center space-x-2"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
