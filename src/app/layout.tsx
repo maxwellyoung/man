@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     description: "Join us for a night of metrosexual awareness and celebration",
     images: [
       {
-        url: "https://your-website.com/og-image.jpg", // Replace with your actual image URL
+        url: "https://www.metrosexualawareness.com/og-image.jpg", // Replace with your actual image URL
         width: 1200,
         height: 630,
         alt: "Metrosexual Awareness Night Preview",
@@ -25,12 +25,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Metrosexual Awareness Night",
     description: "Join us for a night of metrosexual awareness and celebration",
-    images: ["https://your-website.com/twitter-image.jpg"], // Replace with your actual image URL
+    images: ["https://www.metrosexualawareness.com/og-image.jpg"], // Replace with your actual image URL
   },
   icons: {
     icon: [
       { url: "/favicon.svg" },
-      new URL("/favicon.svg", "https://your-website.com"),
+      new URL("/favicon.svg", "https://www.metrosexualawareness.com"),
     ],
     apple: [
       { url: "/favicon.svg" },
