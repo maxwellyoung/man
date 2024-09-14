@@ -711,12 +711,12 @@ export default function MotionDesignMANAnimation() {
                       <DetailItem
                         icon={<Calendar size={18} />}
                         label="Date"
-                        value="SEP 15, 2024"
+                        value="OCT 11, 2024"
                       />
                       <DetailItem
                         icon={<Clock size={18} />}
                         label="Time"
-                        value="20:00-02:00"
+                        value="9PM-3AM"
                       />
                       <DetailItem
                         icon={<MapPin size={18} />}
