@@ -726,7 +726,7 @@ export default function MotionDesignMANAnimation() {
                       <DetailItem
                         icon={<DollarSign size={18} />}
                         label="Entry Fee"
-                        value="$100.00"
+                        value="$50.00"
                       />
                       <DetailItem
                         icon={<DollarSign size={18} />}
