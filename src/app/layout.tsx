@@ -29,12 +29,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.svg" },
-      new URL("/favicon.svg", "https://www.metrosexualawareness.com"),
-    ],
-    apple: [
-      { url: "/favicon.svg" },
-      { url: "/favicon.svg", sizes: "180x180", type: "image/svg+xml" },
+      {
+        url: "/man-logo.webp",
+        type: "image/webp",
+      },
     ],
   },
 };

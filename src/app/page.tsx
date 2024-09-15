@@ -677,20 +677,6 @@ export default function MotionDesignMANAnimation() {
               </span>
             </motion.button>
           </div>
-
-          {/* New Buy Tickets button outside the drawer */}
-          <motion.a
-            href="https://www.undertheradar.co.nz/gig/92332/Metrosexual-Awareness-Night.utr"
-            className="fixed bottom-4 right-4 bg-[#FF588F] text-[#1a1a1a] px-4 py-2 sm:px-6 sm:py-3 rounded-full shadow-lg hover:bg-[#FF7AA7] transition-colors duration-300 flex items-center space-x-2 z-50"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Ticket size={20} />
-            <span className="font-authentic font-bold tracking-wider">
-              BUY TICKETS
-            </span>
-          </motion.a>
-
           <AnimatePresence>
             {isDrawerOpen && (
               <motion.div
@@ -739,13 +725,13 @@ export default function MotionDesignMANAnimation() {
                       />
                       <DetailItem
                         icon={<DollarSign size={18} />}
-                        label="Metrosexual Price"
-                        value="$15.00"
+                        label="Entry Fee"
+                        value="$50.00"
                       />
                       <DetailItem
                         icon={<DollarSign size={18} />}
-                        label="Non-Metrosexual Price"
-                        value="$50.00"
+                        label="Metrosexual Concession"
+                        value="$15.00"
                       />
                       <DetailItem
                         icon={<Shirt size={18} />}
@@ -763,6 +749,15 @@ export default function MotionDesignMANAnimation() {
                         value="HOST B2B, USER 69, DJ CONTRARION, DJ SEÑORITA"
                       />
                     </div>
+                    <motion.a
+                      href="https://www.undertheradar.co.nz/gig/92332/Metrosexual-Awareness-Night.utr"
+                      className="mt-6 sm:mt-8 w-full bg-[#FF588F] text-[#1a1a1a] py-2 sm:py-3 px-4 sm:px-6 rounded-lg text-center font-bold tracking-wider flex items-center justify-center space-x-2"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Ticket size={18} />
+                      <span>BUY TICKETS</span>
+                    </motion.a>
                   </div>
                 </motion.div>
               </motion.div>
