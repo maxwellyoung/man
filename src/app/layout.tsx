@@ -30,8 +30,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/man-logo.webp",
-        type: "image/webp",
+        url: "/man-logo.svg",
+        type: "image/svg+xml",
       },
     ],
   },
