@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import { EventStructuredData } from "./structured-data";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
     description: "Join us for a night of metrosexual awareness and celebration",
     images: [
       {
-        url: "https://www.metrosexualawareness.com/og-image.jpg", // Replace with your actual image URL
+        url: "https://www.metrosexualawareness.com/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Metrosexual Awareness Night Preview",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Metrosexual Awareness Night",
     description: "Join us for a night of metrosexual awareness and celebration",
-    images: ["https://www.metrosexualawareness.com/og-image.jpg"], // Replace with your actual image URL
+    images: ["https://www.metrosexualawareness.com/og-image.jpg"],
   },
   icons: {
     icon: [
@@ -34,6 +35,12 @@ export const metadata: Metadata = {
         type: "image/svg+xml",
       },
     ],
+  },
+  keywords: "metrosexual, awareness, event, celebration, fashion, grooming",
+  authors: [{ name: "Maxwell Young", url: "https://maxwellyoung.info" }],
+  robots: "index, follow",
+  alternates: {
+    canonical: "https://www.metrosexualawareness.com",
   },
 };
 
@@ -45,6 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <EventStructuredData />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-GJPG14LXDN"
           strategy="afterInteractive"
