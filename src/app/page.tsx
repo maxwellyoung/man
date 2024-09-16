@@ -746,7 +746,7 @@ export default function MotionDesignMANAnimation() {
                       <DetailItem
                         icon={<DollarSign size={18} />}
                         label="Non-Metrosexual Price"
-                        value="$50.00"
+                        value="$150.00"
                       />
                       <DetailItem
                         icon={<Shirt size={18} />}
