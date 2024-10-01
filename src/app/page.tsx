@@ -6,10 +6,17 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  memo,
 } from "react";
 import { gsap } from "gsap";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  MotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import {
   Calendar,
   Clock,
@@ -26,6 +33,11 @@ import {
   Music,
 } from "lucide-react";
 import * as THREE from "three";
+import { addHours, differenceInDays, differenceInSeconds } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
+import { Roboto_Mono } from "next/font/google";
+
+const robotoMono = Roboto_Mono({ subsets: ["latin"] });
 
 export default function MotionDesignMANAnimation() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -583,8 +595,83 @@ export default function MotionDesignMANAnimation() {
     </svg>
   );
 
+  const fontSize = 30;
+  const padding = 15;
+  const height = fontSize + padding;
+
+  const Countdown = memo(function Countdown({
+    isDrawerOpen,
+  }: {
+    isDrawerOpen: boolean;
+  }) {
+    const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+    const targetDate = useMemo(
+      () => toZonedTime(new Date("2024-10-11T21:00:00"), "Pacific/Auckland"),
+      []
+    );
+
+    const updateCountdown = useCallback(() => {
+      const now = toZonedTime(new Date(), "Pacific/Auckland");
+      const secondsLeft = Math.max(0, differenceInSeconds(targetDate, now));
+      setTimeLeft(secondsLeft);
+    }, [targetDate]);
+
+    useEffect(() => {
+      updateCountdown();
+      const interval = setInterval(updateCountdown, 1000);
+      return () => clearInterval(interval);
+    }, [updateCountdown]);
+
+    const timeValues = useMemo(() => {
+      if (timeLeft === null) return null;
+      const days = Math.floor(timeLeft / (24 * 60 * 60));
+      const hours = Math.floor((timeLeft % (24 * 60 * 60)) / (60 * 60));
+      const minutes = Math.floor((timeLeft % (60 * 60)) / 60);
+      const seconds = timeLeft % 60;
+      return { days, hours, minutes, seconds };
+    }, [timeLeft]);
+
+    if (!timeValues || isDrawerOpen) return null;
+
+    return (
+      <div className="fixed top-0 left-0 right-0 z-50 bg-[#1a1a1a80] backdrop-blur-md p-1 sm:p-2 shadow-lg">
+        <div className="flex justify-center space-x-2 sm:space-x-4">
+          <Counter value={timeValues.days} label="D" />
+          <Counter value={timeValues.hours} label="H" />
+          <Counter value={timeValues.minutes} label="M" />
+          <Counter value={timeValues.seconds} label="S" />
+        </div>
+      </div>
+    );
+  });
+
+  const Counter = memo(function Counter({
+    value,
+    label,
+  }: {
+    value: number;
+    label: string;
+  }) {
+    return (
+      <div className="flex items-center space-x-1">
+        <div
+          className={`${robotoMono.className} text-white text-sm sm:text-lg font-bold`}
+        >
+          {value.toString().padStart(2, "0")}
+        </div>
+        <span className="text-gray-300 text-[8px] sm:text-xs font-authentic">
+          {label}
+        </span>
+      </div>
+    );
+  });
+
   return (
     <div className="font-goldeneye min-h-screen bg-[#1e1e1e] text-[#d4d4d4] select-none overflow-hidden cursor-none">
+      {animationComplete && !isDrawerOpen && (
+        <Countdown isDrawerOpen={isDrawerOpen} />
+      )}
       <div className="absolute inset-0 backdrop-blur-sm z-10" />
       <div
         ref={containerRef}
@@ -678,10 +765,9 @@ export default function MotionDesignMANAnimation() {
             </motion.button>
           </div>
 
-          {/* New Buy Tickets button outside the drawer */}
           <motion.a
             href="https://www.undertheradar.co.nz/gig/92332/Metrosexual-Awareness-Night.utr"
-            className="fixed bottom-4 right-4 bg-[#FF588F] text-[#1a1a1a] px-4 py-2 sm:px-6 sm:py-3 rounded-full shadow-lg hover:bg-[#FF7AA7] transition-colors duration-300 flex items-center space-x-2 z-50"
+            className="fixed bottom-4 right-4 bg-[#1a1a1a80] backdrop-blur-md text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full shadow-lg hover:bg-[#1a1a1a] transition-colors duration-300 flex items-center space-x-2 z-50"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
