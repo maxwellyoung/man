@@ -647,7 +647,7 @@ export default function MotionDesignMANAnimation() {
         </div>
 
         {/* Desktop version */}
-        <div className="fixed top-6 right-6 z-50 bg-[#1a1a1a80] backdrop-blur-md p-4 rounded-lg shadow-lg hidden sm:block shadow-[inset_0_0_8px_rgba(0,0,0,0.3)]">
+        <div className="fixed top-6 right-6 z-50 bg-[#1a1a1a80] backdrop-blur-md p-4 rounded-lg hidden sm:block shadow-[inset_0_0_8px_rgba(0,0,0,0.3)]">
           <div className="flex space-x-4">
             <Counter value={timeValues.days} label="DAYS" />
             <Counter value={timeValues.hours} label="HOURS" />
