@@ -635,14 +635,27 @@ export default function MotionDesignMANAnimation() {
     if (!timeValues || isDrawerOpen) return null;
 
     return (
-      <div className="fixed top-0 left-0 right-0 z-50 bg-[#1a1a1a80] backdrop-blur-md p-1 sm:p-2 shadow-lg">
-        <div className="flex justify-center space-x-2 sm:space-x-4">
-          <Counter value={timeValues.days} label="D" />
-          <Counter value={timeValues.hours} label="H" />
-          <Counter value={timeValues.minutes} label="M" />
-          <Counter value={timeValues.seconds} label="S" />
+      <>
+        {/* Mobile version */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-[#1a1a1a80] backdrop-blur-md p-1 sm:hidden shadow-[inset_0_0_8px_rgba(0,0,0,0.3)]">
+          <div className="flex justify-center items-center space-x-2">
+            <Counter value={timeValues.days} label="D" />
+            <Counter value={timeValues.hours} label="H" />
+            <Counter value={timeValues.minutes} label="M" />
+            <Counter value={timeValues.seconds} label="S" />
+          </div>
         </div>
-      </div>
+
+        {/* Desktop version */}
+        <div className="fixed top-6 right-6 z-50 bg-[#1a1a1a80] backdrop-blur-md p-4 rounded-lg shadow-lg hidden sm:block shadow-[inset_0_0_8px_rgba(0,0,0,0.3)]">
+          <div className="flex space-x-4">
+            <Counter value={timeValues.days} label="DAYS" />
+            <Counter value={timeValues.hours} label="HOURS" />
+            <Counter value={timeValues.minutes} label="MINUTES" />
+            <Counter value={timeValues.seconds} label="SECONDS" />
+          </div>
+        </div>
+      </>
     );
   });
 
@@ -654,13 +667,13 @@ export default function MotionDesignMANAnimation() {
     label: string;
   }) {
     return (
-      <div className="flex items-center space-x-1">
+      <div className="flex flex-col items-center">
         <div
-          className={`${robotoMono.className} text-white text-sm sm:text-lg font-bold`}
+          className={`${robotoMono.className} text-white text-xs sm:text-2xl font-bold`}
         >
           {value.toString().padStart(2, "0")}
         </div>
-        <span className="text-gray-300 text-[8px] sm:text-xs font-authentic">
+        <span className="text-gray-300 text-[6px] sm:text-xs font-authentic mt-0.5">
           {label}
         </span>
       </div>
